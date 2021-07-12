@@ -1,0 +1,114 @@
+---
+title: "Everyday statistics in 30 minutes"
+author: "Peter Geelan-Small - Stats Central, UNSW"
+date: "29th July, 2021"
+output:
+  xaringan::moon_reader:
+    css: [default, metropolis, metropolis-fonts]
+    lib_dir: libs
+    self_contained: false
+    nature:
+      highlightStyle: github
+      countIncrementalSlides: false
+      beforeInit: "macros.js"
+---
+
+
+
+```{r setup, include = F}
+
+knitr::opts_chunk$set(echo = F, fig.align = "center", 
+                      fig.asp = 1,
+                      echo = F, message = F, warning = F)
+
+```
+
+
+
+
+```{r xaringan-logo, echo = F}
+
+library(xaringanExtra)
+
+use_logo(
+  image_url = "StatsCentralLogo_rmd.png",
+  width = "110px",
+  height = "128px",
+  position = css_position(bottom = "-2.5em", left = "1em"),
+  link_url = NULL,
+  exclude_class = c("title-slide", "inverse", "hide_logo")
+)
+
+```
+
+
+
+
+```{r echo = F, message = F}
+
+library(RColorBrewer)
+library(wordcloud)
+library(tidyverse)
+library(ggpubr)
+library(GGally)
+library(plotly)
+library(reshape2)  ## For "acast"
+library(png)
+library(kableExtra)
+library(emmeans)
+
+```
+
+
+<style type="text/css">
+.remark-slide-content {
+  font-size: 28px;
+  padding: 1em 1em 1em 1em;
+}
+</style>
+
+
+
+# Background
+
+Why think about link between $t$ test and regression?
+
+```{r eval = F}
+
+#words_df <- read.csv("../data/stats_tests.csv", header = F)
+
+words_df <- read.csv("../data/stats_tests.csv", header = F)
+
+{{wordcloud(words = words_df[ , 1], freq = words_df[ , 2],
+          colors = brewer.pal(6, "Dark2"),
+          random.color = T,
+          scale = c(3, 1), rot.per = 1/4)}}
+
+```
+
+
+
+---
+
+# Outline
+
+
+
+---
+
+# Outline
+
+
+
+---
+
+# Data
+
+---
+
+
+# References
+
+
+
+
