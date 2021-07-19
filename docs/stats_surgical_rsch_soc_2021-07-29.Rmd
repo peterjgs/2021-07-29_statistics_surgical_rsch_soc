@@ -132,6 +132,130 @@ wordcloud(words = words_df[ , 1], freq = words_df[ , 2],
 
 # Outline
 
+Harris
+
+Errors/sec - *plot data*
+
+Continuous outcome
+
+- independent data
+
+- continuous predictor - mean jerk - normal distribn - simple linear regression
+    - assumptions  $\;\rightarrow\;$ transformation
+
+But, it's really a rate
+
+- count per unit time - Poisson - GLM
+    - assumptions
+
+---
+
+# Outline
+
+Knot-tying time - *plot data*
+
+Continuous outcome
+
+- independent data
+
+- categorical predictor - two groups - gender - t test
+    - assumptions
+    
+---
+
+# Outline
+ 
+Knot-tying time - *plot data*
+
+Continuous outcome
+
+- independent data
+
+- categorical predictor - three groups - condition - ANOVA
+    - assumptions
+    - multiple comparisons - compare all to control
+
+
+---
+
+# Outline
+
+Continuous outcome - normal distribn
+
+Mean jerk - *plot data*
+
+Compare baseline to post-observation
+
+Data not independent
+
+Mean jerk - *plot data*
+
+- categorical predictor - two times - paired t test
+    - assumptions
+
+
+---
+
+# Outline
+
+Continuous outcome - normal distribn
+
+Mean jerk - *plot data*
+
+Compare baseline to post-observation to retention
+
+Data not independent
+
+Mean jerk - *plot data*
+
+- categorical predictor - three times - mixed model
+    - assumptions
+
+---
+
+# Outline
+
+Categorical outcome
+
+Independent data
+
+Knot-tying skill (sat or unsat) - - *plot data*
+
+Is there an association with condition?
+
+Pearson's $\chi^2$ test
+- assumptions
+
+---
+
+# Outline
+
+Kinoshita
+
+POD
+
+Binary outcome
+
+Is there an association between NLR </>= 3 ad POD?
+
+Pearson's $\chi^2$ test
+- assumptions
+
+Can't estimate parameter or use controlling variables
+
+
+---
+
+# Outline
+
+Kinoshita
+
+POD
+
+Binary outcome
+
+- categorical predictor - NLR
+- controlling variable - ACCI
 
 
 ---
@@ -139,13 +263,24 @@ wordcloud(words = words_df[ , 1], freq = words_df[ , 2],
 # Outline
 
 
+ICDSC score - 1, 2, ... , 6
 
+"Quantitative" outcome - or is it?
+
+Predictor - NLR - continuous or categorical (by interval)?
+
+Normal assumption untenable
+
+- non-parametric method - Kruskal-Wallis
+    - compare NLR levels against lowest (Dunn's test)
+    
+- ordered categorical variable - ordinal logistic regression
+    - NLR categories
+    - NLR continuous
+    
+    
+  
 ---
-
-# Data
-
----
-
 
 # References
 
