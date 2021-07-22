@@ -50,6 +50,7 @@ library(RColorBrewer)
 library(wordcloud)
 library(tidyverse)
 library(ggpubr)
+library(faraway)  ## For "sumary"
 library(GGally)
 library(plotly)
 library(reshape2)  ## For "acast"
@@ -103,7 +104,7 @@ How do you know what statistical analysis methods to use?
 - Early 1900s - Pearson's $\chi^2$ (chi-squared) test
 - 1908 - $t$ test
 - 1920s or so - analysis of variance (ANOVA) and analysis of covariance (ANCOVA)
-- 1972 - generalised linear models - brought models based on normal, binomial, Poisson and other distributions together
+- 1972 - generalised linear models - models based on normal, binomial, Poisson and other distributions unified
 
 
 ---
@@ -130,9 +131,130 @@ wordcloud(words = words_df[ , 1], freq = words_df[ , 2],
 
 ---
 
-# Outline
+# Linear model: linear regression
 
-Harris
+```{r}
+
+## Load data
+
+load("../data/harris_data_obj.RData")
+
+load("../data/kinoshita_data_obj.RData")
+
+```
+
+
+Harris (2017): Surgical instrument proficiency
+
+Proficiency in instrument control: Is smooth instrument movement related to error rate in a ring-carrying exercise?
+
+*Outcome:* No. errors per sec. (baseline) - continuous
+
+*Predictor:* Mean jerk (change in acceleration) - continuous
+
+*Data:* independent
+
+*Model:* linear regression
+
+$$\mathrm{ErrorRate} = \beta_0 + \beta_1 \; \mathrm{MeanJerk}$$
+
+---
+
+# Linear model: linear regression
+
+
+```{r}
+
+p_surg_err <- 
+  ggplot(surg, aes(x = "", y = ERRORS.SEC_RT1)) +
+  geom_boxplot(outlier.shape = NA, width = 0.4) +  # avoid plotting outliers twice
+  geom_jitter(position = position_jitter(width = 0.1, height = 0.1)) +
+  labs(x = "", y = "Error per sec.") +
+  theme_classic()
+
+
+p_surg_jerk <- 
+  ggplot(surg, aes(x = "", y = MeanJerk1)) +
+  geom_boxplot(outlier.shape = NA, width = 0.4) +  # avoid plotting outliers twice
+  geom_jitter(position = position_jitter(width = 0.1, height = 0.1)) +
+  labs("", y = "Mean jerk (m/s^3)") +
+  theme_classic()
+
+
+ggarrange(p_surg_err, p_surg_jerk, ncol = 2)
+
+```
+
+
+---
+
+# Linear model: linear regression
+
+
+```{r}
+
+p_surg_err_jerk <- 
+  ggplot(surg_sub1, aes(x = MeanJerk1, y = ERRORS.SEC_RT1)) +
+  geom_point() +
+  labs(x = "Mean jerk (m/s^3)", y = "Errors per sec.") +
+  theme_classic()
+
+print(p_surg_err_jerk)
+
+```
+
+---
+
+# Linear model: linear regression
+
+
+```{r}
+
+err.lm1 <- lm(ERRORS.SEC_RT1 ~ MeanJerk1, data = surg_sub1)
+
+#anova(err.lm1)
+
+sumary(err.lm1)
+
+```
+
+*Assumptions*
+
+- normal distribution of residuals
+- constant variance of residuals
+
+
+---
+
+# Linear model: linear regression
+
+Assumptions
+
+```{r}
+
+res_fit_err1_df <- data.frame(sres = rstandard(err.lm1),
+                           fit = fitted(err.lm1))
+
+p_res_fit_err1 <- 
+  ggplot(res_fit_err1_df, aes(x = fit, y = sres)) +
+  geom_point() +
+  labs(x = "Fitted values", y = "Standardised residuals") +
+  theme_classic()
+
+p_qq_err1 <- 
+  ggplot(res_fit_err1_df, aes(sample = sres)) +
+  geom_qq() +
+  geom_qq_line() +
+  labs(x = "Normal quantile", y = "Sample quantile") +
+  theme_classic()
+
+ggarrange(p_res_fit_err1, p_qq_err1)
+
+```
+
+---
+
+
 
 Errors/sec - *plot data*
 
