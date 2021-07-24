@@ -51,6 +51,7 @@ library(wordcloud)
 library(tidyverse)
 library(ggpubr)
 library(faraway)  ## For "sumary"
+library(statmod)
 library(GGally)
 library(plotly)
 library(reshape2)  ## For "acast"
@@ -152,9 +153,9 @@ Proficiency in instrument control: Is smooth instrument movement related to erro
 
 *Predictor:* Mean jerk (change in acceleration) - continuous
 
-*Data:* independent
+*Data structure:* Independent
 
-*Model:* linear regression
+*Model:* Linear regression - normal distribution assumption
 
 $$\mathrm{ErrorRate} = \beta_0 + \beta_1 \; \mathrm{MeanJerk}$$
 
@@ -162,6 +163,8 @@ $$\mathrm{ErrorRate} = \beta_0 + \beta_1 \; \mathrm{MeanJerk}$$
 
 # Linear model: linear regression
 
+
+.pull-left[
 
 ```{r}
 
@@ -172,26 +175,44 @@ p_surg_err <-
   labs(x = "", y = "Error per sec.") +
   theme_classic()
 
+print(p_surg_err)
+
+
+```
+
+
+Some positive skewness
+
+]
+
+.pull-right[
+
+```{r}
 
 p_surg_jerk <- 
   ggplot(surg, aes(x = "", y = MeanJerk1)) +
   geom_boxplot(outlier.shape = NA, width = 0.4) +  # avoid plotting outliers twice
   geom_jitter(position = position_jitter(width = 0.1, height = 0.1)) +
-  labs("", y = "Mean jerk (m/s^3)") +
+  labs(x = "", y = "Mean jerk (m/s^3)") +
   theme_classic()
 
-
-ggarrange(p_surg_err, p_surg_jerk, ncol = 2)
+print(p_surg_jerk)
 
 ```
+
+]
 
 
 ---
 
 # Linear model: linear regression
 
+.pull-left[
 
 ```{r}
+
+# Chunk option: out.width = "50%"
+
 
 p_surg_err_jerk <- 
   ggplot(surg_sub1, aes(x = MeanJerk1, y = ERRORS.SEC_RT1)) +
@@ -202,6 +223,16 @@ p_surg_err_jerk <-
 print(p_surg_err_jerk)
 
 ```
+
+]
+
+.pull-right[
+
+- Linear relationship
+- *Variability* of error rate increases with mean jerk
+
+]
+
 
 ---
 
@@ -218,28 +249,66 @@ sumary(err.lm1)
 
 ```
 
+Can we accept this model as valid?
+
+Check the assumptions!
+
 *Assumptions*
 
-- normal distribution of residuals
-- constant variance of residuals
+- Residuals have constant variance
+- Residuals are normally distributed
 
 
 ---
 
 # Linear model: linear regression
 
-Assumptions
+.pull-left[
+
+Assumption 1: Residuals have constant variance
+
+- Fanning pattern suggests variance not constant
+
+]
+
+
+.pull-right[
 
 ```{r}
 
 res_fit_err1_df <- data.frame(sres = rstandard(err.lm1),
-                           fit = fitted(err.lm1))
+                              fit = fitted(err.lm1))
 
 p_res_fit_err1 <- 
   ggplot(res_fit_err1_df, aes(x = fit, y = sres)) +
   geom_point() +
   labs(x = "Fitted values", y = "Standardised residuals") +
+  ggtitle("Raw outcome") +
   theme_classic()
+
+print(p_res_fit_err1)
+
+```
+
+]
+
+---
+
+# Linear model: linear regression
+
+
+.pull-left[
+
+Assumption 2: Residuals normally distributed
+
+- No gross deviation apparent
+
+]
+
+
+.pull-right[
+
+```{r}
 
 p_qq_err1 <- 
   ggplot(res_fit_err1_df, aes(sample = sres)) +
@@ -248,55 +317,592 @@ p_qq_err1 <-
   labs(x = "Normal quantile", y = "Sample quantile") +
   theme_classic()
 
-ggarrange(p_res_fit_err1, p_qq_err1)
+print(p_qq_err1)
+
+```
+
+]
+
+
+---
+
+# Linear model: linear regression
+
+
+.pull-left[
+
+Address non-constant variance
+
+- Log-transforming positively skewed outcome may be useful
+- Log transformation maybe a little too strong
+
+]
+
+
+.pull-right[
+
+```{r}
+
+surg$logERRORS.SEC_RT1 <- log(surg$ERRORS.SEC_RT1 )
+
+ggplot(surg, aes(x = "", y = logERRORS.SEC_RT1)) +
+  geom_boxplot(outlier.shape = NA, width = 0.4) +  # avoid plotting outliers twice
+  geom_jitter(position = position_jitter(width = 0.1, height = 0.1))
+
+```
+
+]
+
+
+---
+
+# Linear model: linear regression
+
+.pull-left[
+
+No improvement!
+
+]
+
+.pull-right[
+
+```{r}
+
+
+err.lm2 <- lm(logERRORS.SEC_RT1 ~ MeanJerk1, data = surg_sub1)
+
+res_fit_err2_df <- data.frame(sres = rstandard(err.lm2),
+                              fit = fitted(err.lm2))
+
+
+p_res_fit_err2 <- 
+  ggplot(res_fit_err2_df, aes(x = fit, y = sres)) +
+  geom_point() +
+  labs(x = "Fitted values", y = "Standardised residuals") +
+  ggtitle("Log-transformed outcome") +
+  theme_classic()
+
+print(p_res_fit_err2)
+
+```
+
+]
+
+
+---
+
+# Generalised linear model - Poisson
+
+But "errors per sec." is really a rate
+
+- different types of regression model for different types of outcome variable
+- count over given time intervals  - Poisson distribution (0 is possible value, no upper limit)
+- *generalised* linear model (non-normal outcome variable)
+
+
+
+---
+
+# Generalised Linear model - Poisson
+
+
+```{r}
+
+err.glm1 <- glm(RT1Errors ~ MeanJerk1 + offset(log(RT1Time)),
+                family = poisson, data = surg)
+
+sumary(err.glm1)
+
+```
+
+Can we accept this model as valid?
+
+Check the assumptions!
+
+*Assumptions*
+
+- Quantile residuals have constant variance (constant dispersion)
+- Quantile residuals are normally distributed
+
+
+---
+
+# Generalised Linear model - Poisson
+
+```{r}
+
+res_fit_err_glm1_df <- data.frame(res = qresiduals(err.glm1),
+                                  fit = fitted(err.glm1))
+
+p_res_fit_err_glm1 <- 
+  ggplot(res_fit_err_glm1_df, aes(x = fit, y = res)) +
+  geom_point() +
+  labs(x = "Fitted values", y = "Standardised residuals") +
+  ggtitle("Poisson model") +
+  theme_classic()
+
+print(p_res_fit_err_glm1)
+
+
+```
+
+
+
+---
+
+```{r}
+
+p_qq_err_glm1 <- 
+  ggplot(res_fit_err_glm1_df, aes(sample = res)) +
+  geom_qq() +
+  geom_qq_line() +
+  labs(x = "Normal quantile", y = "Sample quantile") +
+  ggtitle("Poisson model") +
+  theme_classic()
+
+print(p_qq_err_glm1)
+
+```
+
+
+---
+
+# Generalised Linear model - Negative binomial
+
+```{r}
+
+err.glm2 <- glm.nb(RT1Errors ~ MeanJerk1 + offset(log(RT1Time)),
+                   data = surg)
+
+#summary(err.glm2)
+
+```
+
+
+
+```{r}
+
+res_fit_err_glm2_df <- data.frame(res = qresiduals(err.glm2),
+                                  fit = fitted(err.glm2))
+
+p_res_fit_err_glm2 <- 
+  ggplot(res_fit_err_glm2_df, aes(x = fit, y = res)) +
+  geom_point() +
+  labs(x = "Fitted values", y = "Standardised residuals") +
+  ggtitle("Negative binomial model") +
+  theme_classic()
+
+print(p_res_fit_err_glm2)
 
 ```
 
 ---
 
 
+```{r}
 
-Errors/sec - *plot data*
+p_qq_err_glm2 <- 
+  ggplot(res_fit_err_glm2_df, aes(sample = res)) +
+  geom_qq() +
+  geom_qq_line() +
+  labs(x = "Normal quantile", y = "Sample quantile") +
+  ggtitle("Negative binomial model") +
+  theme_classic()
 
-Continuous outcome
+print(p_qq_err_glm2)
 
-- independent data
+```
 
-- continuous predictor - mean jerk - normal distribn - simple linear regression
-    - assumptions  $\;\rightarrow\;$ transformation
 
-But, it's really a rate
-
-- count per unit time - Poisson - GLM
-    - assumptions
 
 ---
 
-# Outline
+```{r}
 
-Knot-tying time - *plot data*
+BIC(err.glm1)
 
-Continuous outcome
+BIC(err.glm2)
 
-- independent data
+```
 
-- categorical predictor - two groups - gender - t test
-    - assumptions
+---
+
+# Two independent groups
+
+Is knot-tying time associated with watching an expert demonstration of the technique?
+
+*Outcome:* Time (s) to tie a knot - continuous
+
+*Predictor:* Training condition (2 groups - control, expert)
+
+*Data structure:* Independent
+
+*Model:* Two independent sample $t$ test - normal distribution assumption
+
+$$\mathrm{Time} = \beta_0 + \beta_1 \; \mathrm{Condition_{expert}}$$
+
+---
+
+# Two independent sample $t$ test
+
+*Assumptions*
+
+- Independence
+    - the two samples are independent
+    - data values within each sample are independent
+- Constant variance
+    - data values in each group have "same" variance 
+- Normal distribution
+    - data in each group is normally distributed
+
+---
+
+# Two independent sample $t$ test
+
+*Assumptions*
+
+- Judge if assumptions are satisfied using diagnostic plots
+    - constant variance: box plot, residual vs. fitted value plot (often hard-wired in software)
+    - normal quantile-quantile (Q-Q) plot
+
+- We recommend you do *not* do hypothesis tests on assumptions
+
+- Use hypothesis tests only for specific research questions
+
+
+---
+
+# Two independent groups 
+
+
+```{r}
+
+## Make data set with required data
+
+ktime2 <- 
+  surg %>%
+  filter(Condition2 == "Control" | Condition2 == "Expert")
+
+ktime2$Condition2 <- factor(ktime2$Condition2)
+
+```
+
+
+.pull-left[
+
+```{r}
+
+ggplot(ktime2, aes(x = "", y = KTTime)) +
+  geom_boxplot(outlier.shape = NA, width = 0.4) +  # avoid plotting outliers twice
+  geom_jitter(position = position_jitter(width = 0.1, height = 0)) +
+  labs(x = "", y = "Time (s)") +
+  ggtitle("Knot-tying time - raw data") +
+  theme_classic()
+
+```
+
+
+]
+
+
+.pull-right[
+
+```{r}
+
+ggplot(ktime2, aes(x = Condition2, y = KTTime)) +
+  geom_boxplot(outlier.shape = NA, width = 0.4) +  # avoid plotting outliers twice
+  geom_jitter(position = position_jitter(width = 0.1, height = 0)) +
+  labs(x = "Condition", y = "Time (s)") +
+  ggtitle("Knot-tying time by group - raw data") +
+  theme_classic()
+
+```
+
+]
+
+Positive skew is evident
+
+
+---
+
+# Two independent groups 
+
+
+.pull-left[
+
+```{r}
+
+ktime2 %>%
+  filter(Condition2 == "Control") %>% 
+  ggplot(., aes(sample = KTTime)) +
+  geom_qq() +
+  geom_qq_line() +
+  labs(x = "Normal quantile", y = "Sample quantile") +
+  ggtitle("Normal Q-Q plot - raw data: Control") +
+  theme_classic()
+
+```
+
+]
+
+
+.pull-right[
+
+```{r}
+
+ktime2 %>%
+  filter(Condition2 == "Expert") %>% 
+  ggplot(., aes(sample = KTTime)) +
+  geom_qq() +
+  geom_qq_line() +
+  labs(x = "Normal quantile", y = "Sample quantile") +
+  ggtitle("Normal Q-Q plot - raw data: Expert") +
+  theme_classic()
+
+```
+
+]
+
+Data deviates visibly from normal distribution
+
+---
+
+# Two independent groups 
+
+.pull-left[
+
+- Skewness in outcome variable can distort model
+- Outlying points can exert undue influence
+- Log-transforming outcome variable may fix this
+
+- Log-transformation appears successful here
+
+]
+
+
+.pull-right[
+
+```{r}
+
+ggplot(ktime2, aes(x = "", y = logKTTime)) +
+  geom_boxplot(outlier.shape = NA, width = 0.4) +  # avoid plotting outliers twice
+  geom_jitter(position = position_jitter(width = 0.1, height = 0)) +
+  labs(x = "", y = "Time (s)") +
+  ggtitle("Knot-tying time - log-tranformed data") +
+  theme_classic()
+
+```
+
+]
+
+---
+
+# Two independent groups 
+
+.pull-left[
+
+- Variances appear equal
+
+]
+
+
+.pull-right[
+
+```{r}
+
+ggplot(ktime2, aes(x = Condition2, y = logKTTime)) +
+  geom_boxplot(outlier.shape = NA, width = 0.4) +  # avoid plotting outliers twice
+  geom_jitter(position = position_jitter(width = 0.1, height = 0)) +
+  labs(x = "Condition", y = "Time (s)") +
+  ggtitle("Knot-tying time by group - log-transformed data") +
+  theme_classic()
+
+
+```
+
+]
+
+---
+
+# Two independent groups 
+
+
+.pull-left[
+
+```{r}
+
+ktime2 %>%
+  filter(Condition2 == "Control") %>% 
+  ggplot(., aes(sample = logKTTime)) +
+  geom_qq() +
+  geom_qq_line() +
+  labs(x = "Normal quantile", y = "Sample quantile") +
+  ggtitle("Normal Q-Q plot - log-transformed data: Control") +
+  theme_classic()
+
+```
+
+]
+
+
+.pull-right[
+
+```{r}
+
+ktime2 %>%
+  filter(Condition2 == "Expert") %>% 
+  ggplot(., aes(sample = logKTTime)) +
+  geom_qq() +
+  geom_qq_line() +
+  labs(x = "Normal quantile", y = "Sample quantile") +
+  ggtitle("Normal Q-Q plot - log-transformed data: Expert") +
+  theme_classic()
+
+```
+
+]
+
+Normal distribution assumption quite well satisfied
+
+---
+
+# Two independent groups 
+
+Carry out two independent sample $t$ test (data on log scale)
+
+
+```{r results = F}
+
+t.test(logKTTime ~ Condition2, data = ktime2, var.equal = T)
+
+```
+
+
+```{r results = F}
+
+kt.lm1 <- lm(logKTTime ~ Condition2, data = ktime2)
+
+summary(kt.lm1)
+
+```
+
+```{r}
+
+kt.emm1 <- emmeans(kt.lm1, pairwise ~ Condition2)
+
+as.data.frame(kt.emm1$emmeans) %>%
+  mutate(across(where(is.numeric), round, 3)) %>%
+  kbl() %>%
+  kable_styling()
+
+```
+
+
+
+```{r}
+
+as.data.frame(kt.emm1$contrasts) %>%
+  mutate(across(where(is.numeric), round, 3)) %>%
+  kbl() %>%
+  kable_styling()
+
+```
+
+```{r}
+
+as.data.frame(confint(kt.emm1)$contrasts) %>%
+  mutate(across(where(is.numeric), round, 3)) %>%
+  kbl() %>%
+  kable_styling()
+
+```
+
+---
+
+# Two independent groups 
+
+Carry out two independent sample $t$ test
+
+*Conclusion*
+
+- There is no evidence against equal group means (P = 0.85).
+- A 95 % confidence interval for the difference in means *on the log scale* is (-0.23, 0.28).
+
+*Note*
+
+You can carry out the $t$ test as a regression model. It is a special case of regression. (In SPSS, "General Linear Model"; in R, "lm")
+
+
+---
+
+# More than two independent groups
+
+Is knot-tying time associated with watching an expert demonstration of the technique? Compare the control group against each other group.
+
+*Outcome:* Time (s) to tie a knot - continuous
+
+*Predictor:* Training condition (4 groups - control, novice, mixed, expert)
+
+*Data structure:* Independent
+
+*Model:* Analysis of variance - normal distribution assumption
+
+
+Multiple two-sample $t$ tests? - No! 
+
+---
+
+# ANOVA: More than 2 independent groups 
+
+*Assumptions*
+
+- Independence
+    - data values are independent
+- Constant variance
+    - residuals have constant variance 
+    - assess with residuals vs. fitted values plot
+- Normal distribution
+    - residuals are normally distributed
+    - assess using normal Q-Q plot
     
+Residual in ANOVA = observed data value - group mean    
+
+
+
 ---
 
-# Outline
- 
-Knot-tying time - *plot data*
+# ANOVA: More than 2 independent groups 
 
-Continuous outcome
+.pull-left[
 
-- independent data
+```{r}
 
-- categorical predictor - three groups - condition - ANOVA
-    - assumptions
-    - multiple comparisons - compare all to control
+ggplot(surg, aes(x = Condition2, y = KTTime)) +
+  geom_boxplot(outlier.shape = NA, width = 0.4) +  # avoid plotting outliers twice
+  geom_jitter(position = position_jitter(width = 0.1, height = 0)) +
+  labs(x = "Condition", y = "Time (s)") +
+  ggtitle("Knot-tying time by group - raw data") +
+  theme_classic()
 
+```
+]
+
+
+.pull-right[
+
+```{r}
+
+ggplot(surg, aes(x = Condition2, y = logKTTime)) +
+  geom_boxplot(outlier.shape = NA, width = 0.4) +  # avoid plotting outliers twice
+  geom_jitter(position = position_jitter(width = 0.1, height = 0)) +
+  labs(x = "Condition", y = "Time (s)") +
+  ggtitle("Knot-tying time by group - log-transformed data") +
+  theme_classic()
+
+```
+
+
+]
 
 ---
 

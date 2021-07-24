@@ -8,6 +8,8 @@
     <link href="libs/remark-css-0.0.1/default.css" rel="stylesheet" />
     <link href="libs/remark-css-0.0.1/metropolis.css" rel="stylesheet" />
     <link href="libs/remark-css-0.0.1/metropolis-fonts.css" rel="stylesheet" />
+    <script src="libs/kePrint-0.0.1/kePrint.js"></script>
+    <link href="libs/lightable-0.0.1/lightable.css" rel="stylesheet" />
   </head>
   <body>
     <textarea id="source">
@@ -139,68 +141,539 @@ Proficiency in instrument control: Is smooth instrument movement related to erro
 
 *Predictor:* Mean jerk (change in acceleration) - continuous
 
-*Data:* independent
+*Data structure:* Independent
 
-*Model:* linear regression
+*Model:* Linear regression - normal distribution assumption
 
-*Assumptions*
-
-- normal distribution of residuals
-- constant variance of residuals
+`$$\mathrm{ErrorRate} = \beta_0 + \beta_1 \; \mathrm{MeanJerk}$$`
 
 ---
 
 # Linear model: linear regression
 
 
-&lt;img src="stats_surgical_rsch_soc_2021-07-29_files/figure-html/unnamed-chunk-4-1.png" width="3" height="3" style="display: block; margin: auto;" /&gt;
+.pull-left[
+
+&lt;img src="stats_surgical_rsch_soc_2021-07-29_files/figure-html/unnamed-chunk-4-1.png" style="display: block; margin: auto;" /&gt;
 
 
----
+Some positive skewness
+
+]
+
+.pull-right[
 
 &lt;img src="stats_surgical_rsch_soc_2021-07-29_files/figure-html/unnamed-chunk-5-1.png" style="display: block; margin: auto;" /&gt;
 
-Errors/sec - *plot data*
+]
 
-Continuous outcome
-
-- independent data
-
-- continuous predictor - mean jerk - normal distribn - simple linear regression
-    - assumptions  `\(\;\rightarrow\;\)` transformation
-
-But, it's really a rate
-
-- count per unit time - Poisson - GLM
-    - assumptions
 
 ---
 
-# Outline
+# Linear model: linear regression
 
-Knot-tying time - *plot data*
+.pull-left[
 
-Continuous outcome
+&lt;img src="stats_surgical_rsch_soc_2021-07-29_files/figure-html/unnamed-chunk-6-1.png" style="display: block; margin: auto;" /&gt;
 
-- independent data
+]
 
-- categorical predictor - two groups - gender - t test
-    - assumptions
+.pull-right[
+
+- Linear relationship
+- *Variability* of error rate increases with mean jerk
+
+]
+
+
+---
+
+# Linear model: linear regression
+
+
+
+```
+##              Estimate Std. Error t value  Pr(&gt;|t|)
+## (Intercept) -0.102935   0.024127 -4.2663 4.077e-05
+## MeanJerk1    3.990533   0.419750  9.5069 3.397e-16
+## 
+## n = 118, p = 2, Residual SE = 0.06182, R-Squared = 0.44
+```
+
+Can we accept this model as valid?
+
+Check the assumptions!
+
+*Assumptions*
+
+- Residuals have constant variance
+- Residuals are normally distributed
+
+
+---
+
+# Linear model: linear regression
+
+.pull-left[
+
+Assumption 1: Residuals have constant variance
+
+- Fanning pattern suggests variance not constant
+
+]
+
+
+.pull-right[
+
+&lt;img src="stats_surgical_rsch_soc_2021-07-29_files/figure-html/unnamed-chunk-8-1.png" style="display: block; margin: auto;" /&gt;
+
+]
+
+---
+
+# Linear model: linear regression
+
+
+.pull-left[
+
+Assumption 2: Residuals normally distributed
+
+- No gross deviation apparent
+
+]
+
+
+.pull-right[
+
+&lt;img src="stats_surgical_rsch_soc_2021-07-29_files/figure-html/unnamed-chunk-9-1.png" style="display: block; margin: auto;" /&gt;
+
+]
+
+
+---
+
+# Linear model: linear regression
+
+
+.pull-left[
+
+Address non-constant variance
+
+- Log-transforming positively skewed outcome may be useful
+- Log transformation maybe a little too strong
+
+]
+
+
+.pull-right[
+
+&lt;img src="stats_surgical_rsch_soc_2021-07-29_files/figure-html/unnamed-chunk-10-1.png" style="display: block; margin: auto;" /&gt;
+
+]
+
+
+---
+
+# Linear model: linear regression
+
+.pull-left[
+
+No improvement!
+
+]
+
+.pull-right[
+
+&lt;img src="stats_surgical_rsch_soc_2021-07-29_files/figure-html/unnamed-chunk-11-1.png" style="display: block; margin: auto;" /&gt;
+
+]
+
+
+---
+
+# Generalised linear model - Poisson
+
+But "errors per sec." is really a rate
+
+- different types of regression model for different types of outcome variable
+- count over given time intervals  - Poisson distribution (0 is possible value, no upper limit)
+- *generalised* linear model (non-normal outcome variable)
+
+
+
+---
+
+# Generalised Linear model - Poisson
+
+
+
+```
+##             Estimate Std. Error z value  Pr(&gt;|z|)
+## (Intercept)  -4.0291     0.1374 -29.323 &lt; 2.2e-16
+## MeanJerk1    32.1147     2.3108  13.897 &lt; 2.2e-16
+## 
+## n = 118 p = 2
+## Deviance = 215.46990 Null Deviance = 387.82392 (Difference = 172.35402)
+```
+
+Can we accept this model as valid?
+
+Check the assumptions!
+
+*Assumptions*
+
+- Quantile residuals have constant variance (constant dispersion)
+- Quantile residuals are normally distributed
+
+
+---
+
+# Generalised Linear model - Poisson
+
+&lt;img src="stats_surgical_rsch_soc_2021-07-29_files/figure-html/unnamed-chunk-13-1.png" style="display: block; margin: auto;" /&gt;
+
+
+
+---
+
+&lt;img src="stats_surgical_rsch_soc_2021-07-29_files/figure-html/unnamed-chunk-14-1.png" style="display: block; margin: auto;" /&gt;
+
+
+---
+
+# Generalised Linear model - Negative binomial
+
+
+
+
+
+&lt;img src="stats_surgical_rsch_soc_2021-07-29_files/figure-html/unnamed-chunk-16-1.png" style="display: block; margin: auto;" /&gt;
+
+---
+
+
+&lt;img src="stats_surgical_rsch_soc_2021-07-29_files/figure-html/unnamed-chunk-17-1.png" style="display: block; margin: auto;" /&gt;
+
+
+
+---
+
+
+```
+## [1] 659.6025
+```
+
+```
+## [1] 640.9559
+```
+
+---
+
+# Two independent groups
+
+Is knot-tying time associated with watching an expert demonstration of the technique?
+
+*Outcome:* Time (s) to tie a knot - continuous
+
+*Predictor:* Training condition (2 groups - control, expert)
+
+*Data structure:* Independent
+
+*Model:* Two independent sample `\(t\)` test - normal distribution assumption
+
+`$$\mathrm{Time} = \beta_0 + \beta_1 \; \mathrm{Condition_{expert}}$$`
+
+---
+
+# Two independent sample `\(t\)` test
+
+*Assumptions*
+
+- Independence
+    - the two samples are independent
+    - data values within each sample are independent
+- Constant variance
+    - data values in each group have "same" variance 
+- Normal distribution
+    - data in each group is normally distributed
+
+---
+
+# Two independent sample `\(t\)` test
+
+*Assumptions*
+
+- Judge if assumptions are satisfied using diagnostic plots
+    - constant variance: box plot, residual vs. fitted value plot (often hard-wired in software)
+    - normal quantile-quantile (Q-Q) plot
+
+- We recommend you do *not* do hypothesis tests on assumptions
+
+- Use hypothesis tests only for specific research questions
+
+
+---
+
+# Two independent groups 
+
+
+
+
+
+.pull-left[
+
+&lt;img src="stats_surgical_rsch_soc_2021-07-29_files/figure-html/unnamed-chunk-20-1.png" style="display: block; margin: auto;" /&gt;
+
+
+]
+
+
+.pull-right[
+
+&lt;img src="stats_surgical_rsch_soc_2021-07-29_files/figure-html/unnamed-chunk-21-1.png" style="display: block; margin: auto;" /&gt;
+
+]
+
+Positive skew is evident
+
+
+---
+
+# Two independent groups 
+
+
+.pull-left[
+
+&lt;img src="stats_surgical_rsch_soc_2021-07-29_files/figure-html/unnamed-chunk-22-1.png" style="display: block; margin: auto;" /&gt;
+
+]
+
+
+.pull-right[
+
+&lt;img src="stats_surgical_rsch_soc_2021-07-29_files/figure-html/unnamed-chunk-23-1.png" style="display: block; margin: auto;" /&gt;
+
+]
+
+Data deviates visibly from normal distribution
+
+---
+
+# Two independent groups 
+
+.pull-left[
+
+- Skewness in outcome variable can distort model
+- Outlying points can exert undue influence
+- Log-transforming outcome variable may fix this
+
+- Log-transformation appears successful here
+
+]
+
+
+.pull-right[
+
+&lt;img src="stats_surgical_rsch_soc_2021-07-29_files/figure-html/unnamed-chunk-24-1.png" style="display: block; margin: auto;" /&gt;
+
+]
+
+---
+
+# Two independent groups 
+
+.pull-left[
+
+- Variances appear equal
+
+]
+
+
+.pull-right[
+
+&lt;img src="stats_surgical_rsch_soc_2021-07-29_files/figure-html/unnamed-chunk-25-1.png" style="display: block; margin: auto;" /&gt;
+
+]
+
+---
+
+# Two independent groups 
+
+
+.pull-left[
+
+&lt;img src="stats_surgical_rsch_soc_2021-07-29_files/figure-html/unnamed-chunk-26-1.png" style="display: block; margin: auto;" /&gt;
+
+]
+
+
+.pull-right[
+
+&lt;img src="stats_surgical_rsch_soc_2021-07-29_files/figure-html/unnamed-chunk-27-1.png" style="display: block; margin: auto;" /&gt;
+
+]
+
+Normal distribution assumption quite well satisfied
+
+---
+
+# Two independent groups 
+
+Carry out two independent sample `\(t\)` test (data on log scale)
+
+
+
+
+
+
+
+&lt;table class="table" style="margin-left: auto; margin-right: auto;"&gt;
+ &lt;thead&gt;
+  &lt;tr&gt;
+   &lt;th style="text-align:left;"&gt; Condition2 &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; emmean &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; SE &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; df &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; lower.CL &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; upper.CL &lt;/th&gt;
+  &lt;/tr&gt;
+ &lt;/thead&gt;
+&lt;tbody&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Control &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 3.979 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.089 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 58 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 3.800 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 4.158 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Expert &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 3.955 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.089 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 58 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 3.776 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 4.134 &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+
+
+
+&lt;table class="table" style="margin-left: auto; margin-right: auto;"&gt;
+ &lt;thead&gt;
+  &lt;tr&gt;
+   &lt;th style="text-align:left;"&gt; contrast &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; estimate &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; SE &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; df &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; t.ratio &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; p.value &lt;/th&gt;
+  &lt;/tr&gt;
+ &lt;/thead&gt;
+&lt;tbody&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Control - Expert &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.025 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.126 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 58 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.194 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.847 &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+
+&lt;table class="table" style="margin-left: auto; margin-right: auto;"&gt;
+ &lt;thead&gt;
+  &lt;tr&gt;
+   &lt;th style="text-align:left;"&gt; contrast &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; estimate &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; SE &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; df &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; lower.CL &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; upper.CL &lt;/th&gt;
+  &lt;/tr&gt;
+ &lt;/thead&gt;
+&lt;tbody&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Control - Expert &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.025 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.126 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 58 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; -0.228 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.278 &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+
+---
+
+# Two independent groups 
+
+Carry out two independent sample `\(t\)` test
+
+*Conclusion*
+
+- There is no evidence against equal group means (P = 0.85).
+- A 95 % confidence interval for the difference in means *on the log scale* is (-0.23, 0.28).
+
+*Note*
+
+You can carry out the `\(t\)` test as a regression model. It is a special case of regression. (In SPSS, "General Linear Model"; in R, "lm")
+
+
+---
+
+# More than two independent groups
+
+Is knot-tying time associated with watching an expert demonstration of the technique? Compare the control group against each other group.
+
+*Outcome:* Time (s) to tie a knot - continuous
+
+*Predictor:* Training condition (4 groups - control, novice, mixed, expert)
+
+*Data structure:* Independent
+
+*Model:* Analysis of variance - normal distribution assumption
+
+
+Multiple two-sample `\(t\)` tests? - No! 
+
+---
+
+# ANOVA: More than 2 independent groups 
+
+*Assumptions*
+
+- Independence
+    - data values are independent
+- Constant variance
+    - residuals have constant variance 
+    - assess with residuals vs. fitted values plot
+- Normal distribution
+    - residuals are normally distributed
+    - assess using normal Q-Q plot
     
+Residual in ANOVA = observed data value - group mean    
+
+
+
 ---
 
-# Outline
- 
-Knot-tying time - *plot data*
+# ANOVA: More than 2 independent groups 
 
-Continuous outcome
+.pull-left[
 
-- independent data
+&lt;img src="stats_surgical_rsch_soc_2021-07-29_files/figure-html/unnamed-chunk-33-1.png" style="display: block; margin: auto;" /&gt;
+]
 
-- categorical predictor - three groups - condition - ANOVA
-    - assumptions
-    - multiple comparisons - compare all to control
 
+.pull-right[
+
+&lt;img src="stats_surgical_rsch_soc_2021-07-29_files/figure-html/unnamed-chunk-34-1.png" style="display: block; margin: auto;" /&gt;
+
+
+]
 
 ---
 
