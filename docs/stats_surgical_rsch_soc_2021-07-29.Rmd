@@ -52,6 +52,8 @@ library(tidyverse)
 library(ggpubr)
 library(faraway)  ## For "sumary"
 library(statmod)
+library(lme4)
+library(lmerTest)
 library(GGally)
 library(plotly)
 library(reshape2)  ## For "acast"
@@ -572,7 +574,7 @@ $$\mathrm{Time} = \beta_0 + \beta_1 \; \mathrm{Condition_{expert}}$$
 
 ---
 
-# Two independent groups 
+# Two independent sample $t$ test
 
 
 ```{r}
@@ -625,7 +627,7 @@ Positive skew is evident
 
 ---
 
-# Two independent groups 
+# Two independent sample $t$ test
 
 
 .pull-left[
@@ -667,7 +669,7 @@ Data deviates visibly from normal distribution
 
 ---
 
-# Two independent groups 
+# Two independent sample $t$ test
 
 .pull-left[
 
@@ -697,7 +699,7 @@ ggplot(ktime2, aes(x = "", y = logKTTime)) +
 
 ---
 
-# Two independent groups 
+# Two independent sample $t$ test
 
 .pull-left[
 
@@ -724,7 +726,7 @@ ggplot(ktime2, aes(x = Condition2, y = logKTTime)) +
 
 ---
 
-# Two independent groups 
+# Two independent sample $t$ test
 
 
 .pull-left[
@@ -766,7 +768,7 @@ Normal distribution assumption quite well satisfied
 
 ---
 
-# Two independent groups 
+# Two independent sample $t$ test
 
 Carry out two independent sample $t$ test (data on log scale)
 
@@ -778,28 +780,44 @@ t.test(logKTTime ~ Condition2, data = ktime2, var.equal = T)
 ```
 
 
+
 ```{r results = F}
 
-kt.lm1 <- lm(logKTTime ~ Condition2, data = ktime2)
+kt.lm1 <- lm(KTTime ~ Condition2, data = ktime2)
 
 summary(kt.lm1)
 
 ```
 
+
+
+```{r results = F}
+
+kt.lm2 <- lm(logKTTime ~ Condition2, data = ktime2)
+
+summary(kt.lm2)
+
+```
+
+
 ```{r}
 
 kt.emm1 <- emmeans(kt.lm1, pairwise ~ Condition2)
-
-as.data.frame(kt.emm1$emmeans) %>%
-  mutate(across(where(is.numeric), round, 3)) %>%
-  kbl() %>%
-  kable_styling()
 
 ```
 
 
 
 ```{r}
+
+kt.emm2 <- emmeans(kt.lm2, pairwise ~ Condition2,
+                   options = list(tran = "log"), type = "response")
+
+```
+
+
+
+```{r eval = F}
 
 as.data.frame(kt.emm1$contrasts) %>%
   mutate(across(where(is.numeric), round, 3)) %>%
@@ -808,7 +826,9 @@ as.data.frame(kt.emm1$contrasts) %>%
 
 ```
 
-```{r}
+
+
+```{r eval = F}
 
 as.data.frame(confint(kt.emm1)$contrasts) %>%
   mutate(across(where(is.numeric), round, 3)) %>%
@@ -817,27 +837,88 @@ as.data.frame(confint(kt.emm1)$contrasts) %>%
 
 ```
 
----
 
-# Two independent groups 
 
-Carry out two independent sample $t$ test
+```{r eval = F}
+
+as.data.frame(kt.emm2$contrasts) %>%
+  mutate(across(where(is.numeric), round, 3)) %>%
+  kbl() %>%
+  kable_styling()
+
+```
+
+
+
+```{r eval = F}
+
+as.data.frame(confint(kt.emm2)$contrasts) %>%
+  mutate(across(where(is.numeric), round, 3)) %>%
+  kbl() %>%
+  kable_styling()
+
+```
+
+
+
+
+```{r}
+
+## Display contrast for logKTTime model with t value and P value
+
+kt.emm2a <- emmeans(kt.lm2, pairwise ~ Condition2)
+
+as.data.frame(kt.emm2a$contrasts) %>%
+  mutate(across(where(is.numeric), round, 3)) %>%
+  kbl() %>%
+  kable_styling(font_size = 20)
+
+```
+
 
 *Conclusion*
-
-- There is no evidence against equal group means (P = 0.85).
-- A 95 % confidence interval for the difference in means *on the log scale* is (-0.23, 0.28).
+- There is no evidence against equal group means (p = 0.85).
 
 *Note*
 
 You can carry out the $t$ test as a regression model. It is a special case of regression. (In SPSS, "General Linear Model"; in R, "lm")
+
+---
+
+# Two independent sample $t$ test
+
+Using the better model gives smaller estimated standard errors
+
+*Raw data*
+
+```{r}
+
+as.data.frame(kt.emm1$emmeans) %>%
+  mutate(across(where(is.numeric), round, 2)) %>%
+  kbl() %>%
+  kable_styling(full_width = F, font_size = 20)
+
+```
+
+
+*Log-transformed data*
+
+
+```{r}
+
+as.data.frame(kt.emm2$emmeans) %>%
+  mutate(across(where(is.numeric), round, 2)) %>%
+  kbl() %>%
+  kable_styling(full_width = F, font_size = 20)
+
+```
 
 
 ---
 
 # More than two independent groups
 
-Is knot-tying time associated with watching an expert demonstration of the technique? Compare the control group against each other group.
+Is knot-tying time associated with observational learning? Compare the control group against each other group.
 
 *Outcome:* Time (s) to tie a knot - continuous
 
@@ -906,20 +987,314 @@ ggplot(surg, aes(x = Condition2, y = logKTTime)) +
 
 ---
 
-# Outline
+# ANOVA: More than 2 independent groups 
 
-Continuous outcome - normal distribn
+```{r}
 
-Mean jerk - *plot data*
+kt.lm3 <- lm(logKTTime ~ Condition2, data = surg)
 
-Compare baseline to post-observation
+anova(kt.lm3)
 
-Data not independent
+```
 
-Mean jerk - *plot data*
+*Conclusion*
 
-- categorical predictor - two times - paired t test
-    - assumptions
+There is no evidence that knot-tying time is associated with observational learning (p = 0.95).
+
+
+---
+
+# ANOVA: More than 2 independent groups 
+
+- As *p* is large, no comparisons with control would be made
+- If *p* were small, those comparisons would be made and P values would need to be adjusted for multiple comparisons
+
+
+```{r}
+
+kt.emm3.nadj <- as.data.frame(
+  emmeans(kt.lm3, trt.vs.ctrl ~ Condition2, adjust = "none")$contrasts)
+
+kt.emm3.dun <- as.data.frame(
+  emmeans(kt.lm3, trt.vs.ctrl ~ Condition2)$contrasts)
+
+kt.emm3.nadj <- as.data.frame(kt.emm3.nadj)
+
+kt.emm3.dun <- as.data.frame(kt.emm3.dun)
+
+kt.emm3.nadj <- 
+  kt.emm3.nadj %>%
+  select(-df, -t.ratio) %>%
+  rename(p.raw = p.value)
+
+kt.emm3.comb <- data.frame(kt.emm3.nadj, 
+                           p.dunnett = kt.emm3.dun$p.value)
+
+as.data.frame(kt.emm3.comb) %>%
+  mutate(across(where(is.numeric), round, 2)) %>%
+  kbl() %>%
+  kable_styling(full_width = F, font_size = 20)
+
+
+```
+
+
+---
+
+# Mixed model: repeated measurements
+
+Proficiency in instrument control: Is smooth instrument movement related to observational learning over time?
+
+*Outcome:* Mean jerk - continuous
+
+*Predictors:*
+- Time (baseline, post-observation, retention) - categorical
+- Training condition (4 groups - control, novice, mixed, expert) - categorical 
+
+*Data structure:* non-independent
+
+*Model:* linear mixed model with time-condition interaction - normal distribution assumption
+
+
+---
+
+# Mixed model: repeated measurements
+
+```{r}
+
+## Make required stacxked data set
+
+jerk_mean1 <- 
+    surg %>%
+    select(Participant, MeanJerk1, MeanJerk2, MeanJerk3) %>%
+    pivot_longer(!Participant, names_to = "Trial", 
+    values_to = "MeanJerk")
+
+#head(jerk_mean1) 
+
+jerk_mean1 <- 
+    jerk_mean1 %>%
+    mutate(Trial2 = ifelse(Trial == "MeanJerk1", "Baseline",
+                           ifelse(Trial == "MeanJerk2", "Post", 
+                                  "Retention")))
+
+#head(jerk_mean1) 
+
+## Add "Condition2"
+
+condit3 <- rep(surg$Condition2, each = 3)
+
+jerk_mean2 <- data.frame(jerk_mean1, Condition2 = condit3)
+
+#jerk_mean2[1:30, ]
+
+jerk_mean2$Participant <- factor(jerk_mean2$Participant)
+
+jerk_mean2$Trial2 <- factor(jerk_mean2$Trial2)
+
+jerk_mean2$Condition2 <- factor(
+    jerk_mean2$Condition2, 
+    levels = c("Novice", "Expert", "Mixed", "Control"))
+
+rm(jerk_mean1)
+
+#summary(jerk_mean2)
+
+```
+
+---
+
+# Mixed model: repeated measurements
+
+.pull-left[
+
+```{r}
+
+ggplot(jerk_mean2, aes(x = Trial2, y = MeanJerk)) + 
+  geom_boxplot(outlier.shape = NA, width = 0.4) +  # avoid plotting outliers twice 
+  geom_jitter(position = position_jitter(width = 0.1, height = 0)) + 
+  labs(x = "Time", y = "Jerk (m/s^3)") +
+  theme_classic()
+
+```
+
+]
+
+.pull-right[
+
+
+```{r}
+
+ggplot(jerk_mean2, aes(x = Condition2, y = MeanJerk)) + 
+  geom_boxplot(outlier.shape = NA, width = 0.4) +  # avoid plotting outliers twice 
+  geom_jitter(position = position_jitter(width = 0.1, height = 0)) + 
+  labs(x = "Training condition", y = "Jerk (m/s^3)") +
+  theme_classic()
+
+
+```
+
+]
+
+---
+
+# Mixed model: repeated measurements
+
+.pull-left[
+
+```{r}
+
+ggplot(jerk_mean2, aes(x = Trial2, y = MeanJerk, colour = Condition2)) +
+  geom_boxplot(outlier.shape = NA) +  # avoid plotting outliers twice
+  geom_point(alpha = 0.5, size = 1, position = position_jitterdodge()) +
+  labs(x = "Time", y = "Jerk (m/s^3)", colour = "Condition") +
+  #guides(fill = guide_legend(title = "Condition")) +
+  ggtitle("Mean jerk - raw data") +
+  theme_classic() 
+
+```
+
+]
+
+.pull-right[
+
+```{r}
+
+jerk_mean2 <-
+  jerk_mean2 %>%
+  na.omit() %>%
+  mutate(logMeanJerk = log(MeanJerk))
+
+ggplot(jerk_mean2, aes(x = Trial2, y = logMeanJerk, colour = Condition2)) +
+  geom_boxplot(outlier.shape = NA) +  # avoid plotting outliers twice
+  geom_point(alpha = 0.5, size = 1, position = position_jitterdodge()) +
+  labs(x = "Time", y = "Jerk (m/s^3)", colour = "Condition") +
+  #guides(fill = guide_legend(title = "Condition")) +
+  ggtitle("Mean jerk - log-transformed data") +
+  theme_classic() 
+
+```
+
+]
+
+```{r eval = F}
+
+ggplot(jerk_mean2, aes(x = Condition2, y = logMeanJerk, colour = Trial2)) +
+  geom_boxplot(outlier.shape = NA) +  # avoid plotting outliers twice
+  geom_point(alpha = 0.5, size = 1, position = position_jitterdodge()) +
+  labs(x = "Time", y = "Jerk (m/s^3)", colour = "Trial") +
+  #guides(fill = guide_legend(title = "Condition")) +
+  ggtitle("Mean jerk - log-transformed data") +
+  theme_classic() 
+
+```
+
+
+```{r eval = F}
+
+tapply(jerk_mean2$MeanJerk, INDEX = jerk_mean2$Trial2, sd, na.rm = T)
+
+```
+
+
+---
+
+
+# Mixed model: repeated measurements
+
+
+```{r}
+
+ggplot(jerk_mean2, aes(x = Trial2, y = MeanJerk, group = Participant)) +
+  geom_line() +
+  labs(x = "Time", y = "Jerk (m/s^3)") +
+  ggtitle("Mean jerk by group for each participant over time") +
+  theme_classic() +
+  facet_wrap(~ Condition2)
+
+```
+
+
+
+---
+
+# Mixed model: repeated measurements
+
+
+```{r}
+
+mj.lmer1 <- lmer(MeanJerk ~ Condition2 * Trial2 + (1 | Participant),
+                 data = jerk_mean2)
+
+
+mj.lmer2 <- lmer(logMeanJerk ~ Condition2 * Trial2 + (1 | Participant),
+                 data = jerk_mean2)
+
+```
+
+
+.pull-left[
+
+```{r}
+
+plot(mj.lmer1, main = "Mean jerk - resids vs fits: raw data")
+
+```
+
+
+]
+
+.pull-right[
+
+```{r}
+
+plot(mj.lmer2, main = "Mean jerk - resids vs fits: log-transformed data")
+
+```
+
+
+```{r eval = F}
+
+mj.res.dev <- residuals(mj.lmer2, type = "deviance")
+
+mj.fit <- fitted(mj.lmer2)
+
+mj.res.fit <- data.frame(res = mj.res.dev, res2 = sqrt(abs(mj.res.dev)), 
+                         fit = mj.fit)
+
+ggplot(mj.res.fit, aes(x = fit, y = res2)) +
+  geom_point() +
+  theme_classic()
+
+```
+
+]
+
+```{r eval = F}
+
+anova(mj.lmer1, type = "II")
+
+```
+
+
+```{r eval = F}
+
+mj.lmer3 <- lmer(MeanJerk ~ Condition2 + Trial2 + (1 | Participant),
+                 data = jerk_mean2)
+
+
+mj.lmer4 <- lmer(logMeanJerk ~ Condition2 + Trial2 + (1 | Participant),
+                 data = jerk_mean2)
+
+```
+
+
+
+```{r eval = F}
+
+anova(mj.lmer3)
+
+```
 
 
 ---
@@ -937,6 +1312,24 @@ Data not independent
 Mean jerk - *plot data*
 
 - categorical predictor - three times - mixed model
+    - assumptions
+
+
+---
+
+# Outline
+
+Continuous outcome - normal distribn
+
+Mean jerk - *plot data*
+
+Compare baseline to post-observation
+
+Data not independent
+
+Mean jerk - *plot data*
+
+- categorical predictor - two times - paired t test
     - assumptions
 
 ---

@@ -414,7 +414,7 @@ Is knot-tying time associated with watching an expert demonstration of the techn
 
 ---
 
-# Two independent groups 
+# Two independent sample `\(t\)` test
 
 
 
@@ -439,7 +439,7 @@ Positive skew is evident
 
 ---
 
-# Two independent groups 
+# Two independent sample `\(t\)` test
 
 
 .pull-left[
@@ -459,7 +459,7 @@ Data deviates visibly from normal distribution
 
 ---
 
-# Two independent groups 
+# Two independent sample `\(t\)` test
 
 .pull-left[
 
@@ -480,7 +480,7 @@ Data deviates visibly from normal distribution
 
 ---
 
-# Two independent groups 
+# Two independent sample `\(t\)` test
 
 .pull-left[
 
@@ -497,7 +497,7 @@ Data deviates visibly from normal distribution
 
 ---
 
-# Two independent groups 
+# Two independent sample `\(t\)` test
 
 
 .pull-left[
@@ -517,7 +517,7 @@ Normal distribution assumption quite well satisfied
 
 ---
 
-# Two independent groups 
+# Two independent sample `\(t\)` test
 
 Carry out two independent sample `\(t\)` test (data on log scale)
 
@@ -527,40 +527,38 @@ Carry out two independent sample `\(t\)` test (data on log scale)
 
 
 
-&lt;table class="table" style="margin-left: auto; margin-right: auto;"&gt;
- &lt;thead&gt;
-  &lt;tr&gt;
-   &lt;th style="text-align:left;"&gt; Condition2 &lt;/th&gt;
-   &lt;th style="text-align:right;"&gt; emmean &lt;/th&gt;
-   &lt;th style="text-align:right;"&gt; SE &lt;/th&gt;
-   &lt;th style="text-align:right;"&gt; df &lt;/th&gt;
-   &lt;th style="text-align:right;"&gt; lower.CL &lt;/th&gt;
-   &lt;th style="text-align:right;"&gt; upper.CL &lt;/th&gt;
-  &lt;/tr&gt;
- &lt;/thead&gt;
-&lt;tbody&gt;
-  &lt;tr&gt;
-   &lt;td style="text-align:left;"&gt; Control &lt;/td&gt;
-   &lt;td style="text-align:right;"&gt; 3.979 &lt;/td&gt;
-   &lt;td style="text-align:right;"&gt; 0.089 &lt;/td&gt;
-   &lt;td style="text-align:right;"&gt; 58 &lt;/td&gt;
-   &lt;td style="text-align:right;"&gt; 3.800 &lt;/td&gt;
-   &lt;td style="text-align:right;"&gt; 4.158 &lt;/td&gt;
-  &lt;/tr&gt;
-  &lt;tr&gt;
-   &lt;td style="text-align:left;"&gt; Expert &lt;/td&gt;
-   &lt;td style="text-align:right;"&gt; 3.955 &lt;/td&gt;
-   &lt;td style="text-align:right;"&gt; 0.089 &lt;/td&gt;
-   &lt;td style="text-align:right;"&gt; 58 &lt;/td&gt;
-   &lt;td style="text-align:right;"&gt; 3.776 &lt;/td&gt;
-   &lt;td style="text-align:right;"&gt; 4.134 &lt;/td&gt;
-  &lt;/tr&gt;
-&lt;/tbody&gt;
-&lt;/table&gt;
 
 
 
-&lt;table class="table" style="margin-left: auto; margin-right: auto;"&gt;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+&lt;table class="table" style="font-size: 20px; margin-left: auto; margin-right: auto;"&gt;
  &lt;thead&gt;
   &lt;tr&gt;
    &lt;th style="text-align:left;"&gt; contrast &lt;/th&gt;
@@ -583,11 +581,27 @@ Carry out two independent sample `\(t\)` test (data on log scale)
 &lt;/tbody&gt;
 &lt;/table&gt;
 
-&lt;table class="table" style="margin-left: auto; margin-right: auto;"&gt;
+
+*Conclusion*
+- There is no evidence against equal group means (p = 0.85).
+
+*Note*
+
+You can carry out the `\(t\)` test as a regression model. It is a special case of regression. (In SPSS, "General Linear Model"; in R, "lm")
+
+---
+
+# Two independent sample `\(t\)` test
+
+Using the better model gives smaller estimated standard errors
+
+*Raw data*
+
+&lt;table class="table" style="font-size: 20px; width: auto !important; margin-left: auto; margin-right: auto;"&gt;
  &lt;thead&gt;
   &lt;tr&gt;
-   &lt;th style="text-align:left;"&gt; contrast &lt;/th&gt;
-   &lt;th style="text-align:right;"&gt; estimate &lt;/th&gt;
+   &lt;th style="text-align:left;"&gt; Condition2 &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; emmean &lt;/th&gt;
    &lt;th style="text-align:right;"&gt; SE &lt;/th&gt;
    &lt;th style="text-align:right;"&gt; df &lt;/th&gt;
    &lt;th style="text-align:right;"&gt; lower.CL &lt;/th&gt;
@@ -596,37 +610,65 @@ Carry out two independent sample `\(t\)` test (data on log scale)
  &lt;/thead&gt;
 &lt;tbody&gt;
   &lt;tr&gt;
-   &lt;td style="text-align:left;"&gt; Control - Expert &lt;/td&gt;
-   &lt;td style="text-align:right;"&gt; 0.025 &lt;/td&gt;
-   &lt;td style="text-align:right;"&gt; 0.126 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Control &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 59.73 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 5.83 &lt;/td&gt;
    &lt;td style="text-align:right;"&gt; 58 &lt;/td&gt;
-   &lt;td style="text-align:right;"&gt; -0.228 &lt;/td&gt;
-   &lt;td style="text-align:right;"&gt; 0.278 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 48.06 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 71.40 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Expert &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 59.47 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 5.83 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 58 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 47.80 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 71.15 &lt;/td&gt;
   &lt;/tr&gt;
 &lt;/tbody&gt;
 &lt;/table&gt;
 
----
 
-# Two independent groups 
+*Log-transformed data*
 
-Carry out two independent sample `\(t\)` test
 
-*Conclusion*
-
-- There is no evidence against equal group means (P = 0.85).
-- A 95 % confidence interval for the difference in means *on the log scale* is (-0.23, 0.28).
-
-*Note*
-
-You can carry out the `\(t\)` test as a regression model. It is a special case of regression. (In SPSS, "General Linear Model"; in R, "lm")
+&lt;table class="table" style="font-size: 20px; width: auto !important; margin-left: auto; margin-right: auto;"&gt;
+ &lt;thead&gt;
+  &lt;tr&gt;
+   &lt;th style="text-align:left;"&gt; Condition2 &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; response &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; SE &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; df &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; lower.CL &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; upper.CL &lt;/th&gt;
+  &lt;/tr&gt;
+ &lt;/thead&gt;
+&lt;tbody&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Control &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 53.47 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 4.78 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 58 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 44.72 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 63.95 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Expert &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 52.18 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 4.66 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 58 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 43.63 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 62.40 &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
 
 
 ---
 
 # More than two independent groups
 
-Is knot-tying time associated with watching an expert demonstration of the technique? Compare the control group against each other group.
+Is knot-tying time associated with observational learning? Compare the control group against each other group.
 
 *Outcome:* Time (s) to tie a knot - continuous
 
@@ -664,33 +706,180 @@ Residual in ANOVA = observed data value - group mean
 
 .pull-left[
 
-&lt;img src="stats_surgical_rsch_soc_2021-07-29_files/figure-html/unnamed-chunk-33-1.png" style="display: block; margin: auto;" /&gt;
+&lt;img src="stats_surgical_rsch_soc_2021-07-29_files/figure-html/unnamed-chunk-40-1.png" style="display: block; margin: auto;" /&gt;
 ]
 
 
 .pull-right[
 
-&lt;img src="stats_surgical_rsch_soc_2021-07-29_files/figure-html/unnamed-chunk-34-1.png" style="display: block; margin: auto;" /&gt;
+&lt;img src="stats_surgical_rsch_soc_2021-07-29_files/figure-html/unnamed-chunk-41-1.png" style="display: block; margin: auto;" /&gt;
 
 
 ]
 
 ---
 
-# Outline
+# ANOVA: More than 2 independent groups 
 
-Continuous outcome - normal distribn
 
-Mean jerk - *plot data*
+```
+## Analysis of Variance Table
+## 
+## Response: logKTTime
+##             Df  Sum Sq  Mean Sq F value Pr(&gt;F)
+## Condition2   3  0.0909 0.030299  0.1194 0.9486
+## Residuals  116 29.4433 0.253821
+```
 
-Compare baseline to post-observation
+*Conclusion*
 
-Data not independent
+There is no evidence that knot-tying time is associated with observational learning (p = 0.95).
 
-Mean jerk - *plot data*
 
-- categorical predictor - two times - paired t test
-    - assumptions
+---
+
+# ANOVA: More than 2 independent groups 
+
+- As *p* is large, no comparisons with control would be made
+- If *p* were small, those comparisons would be made and P values would need to be adjusted for multiple comparisons
+
+
+&lt;table class="table" style="font-size: 20px; width: auto !important; margin-left: auto; margin-right: auto;"&gt;
+ &lt;thead&gt;
+  &lt;tr&gt;
+   &lt;th style="text-align:left;"&gt; contrast &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; estimate &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; SE &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; p.raw &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; p.dunnett &lt;/th&gt;
+  &lt;/tr&gt;
+ &lt;/thead&gt;
+&lt;tbody&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Expert - Control &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; -0.02 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.13 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.85 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.99 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Mixed - Control &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.03 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.13 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.79 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.97 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Novice - Control &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; -0.04 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.13 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.77 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.96 &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+
+
+---
+
+# Mixed model: repeated measurements
+
+Proficiency in instrument control: Is smooth instrument movement related to observational learning over time?
+
+*Outcome:* Mean jerk - continuous
+
+*Predictors:*
+- Time (baseline, post-observation, retention) - categorical
+- Training condition (4 groups - control, novice, mixed, expert) - categorical 
+
+*Data structure:* non-independent
+
+*Model:* linear mixed model with time-condition interaction - normal distribution assumption
+
+
+---
+
+# Mixed model: repeated measurements
+
+
+
+---
+
+# Mixed model: repeated measurements
+
+.pull-left[
+
+&lt;img src="stats_surgical_rsch_soc_2021-07-29_files/figure-html/unnamed-chunk-45-1.png" style="display: block; margin: auto;" /&gt;
+
+]
+
+.pull-right[
+
+
+&lt;img src="stats_surgical_rsch_soc_2021-07-29_files/figure-html/unnamed-chunk-46-1.png" style="display: block; margin: auto;" /&gt;
+
+]
+
+---
+
+# Mixed model: repeated measurements
+
+.pull-left[
+
+&lt;img src="stats_surgical_rsch_soc_2021-07-29_files/figure-html/unnamed-chunk-47-1.png" style="display: block; margin: auto;" /&gt;
+
+]
+
+.pull-right[
+
+&lt;img src="stats_surgical_rsch_soc_2021-07-29_files/figure-html/unnamed-chunk-48-1.png" style="display: block; margin: auto;" /&gt;
+
+]
+
+
+
+
+
+
+
+---
+
+
+# Mixed model: repeated measurements
+
+
+&lt;img src="stats_surgical_rsch_soc_2021-07-29_files/figure-html/unnamed-chunk-51-1.png" style="display: block; margin: auto;" /&gt;
+
+
+
+---
+
+# Mixed model: repeated measurements
+
+
+
+
+
+.pull-left[
+
+&lt;img src="stats_surgical_rsch_soc_2021-07-29_files/figure-html/unnamed-chunk-53-1.png" style="display: block; margin: auto;" /&gt;
+
+]
+
+.pull-right[
+
+&lt;img src="stats_surgical_rsch_soc_2021-07-29_files/figure-html/unnamed-chunk-54-1.png" style="display: block; margin: auto;" /&gt;
+
+]
+
+
+
+
+
+
+
+
+
 
 
 ---
@@ -708,6 +897,24 @@ Data not independent
 Mean jerk - *plot data*
 
 - categorical predictor - three times - mixed model
+    - assumptions
+
+
+---
+
+# Outline
+
+Continuous outcome - normal distribn
+
+Mean jerk - *plot data*
+
+Compare baseline to post-observation
+
+Data not independent
+
+Mean jerk - *plot data*
+
+- categorical predictor - two times - paired t test
     - assumptions
 
 ---
