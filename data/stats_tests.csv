@@ -5,3 +5,7 @@ regression,1
 simple,1
 multivariable,1
 chi-squared,1
+binomial,1
+logistic,1
+ordinal,1
+multinomial,1

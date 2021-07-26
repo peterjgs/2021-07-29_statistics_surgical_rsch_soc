@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="" xml:lang="">
   <head>
-    <title>Everyday statistics in 30 minutes</title>
+    <title>The challenge of everyday statistics in 30 minutes</title>
     <meta charset="utf-8" />
     <meta name="author" content="Peter Geelan-Small - Stats Central, UNSW" />
     <script src="libs/header-attrs-2.9/header-attrs.js"></script>
@@ -15,7 +15,7 @@
     <textarea id="source">
 class: center, middle, inverse, title-slide
 
-# Everyday statistics in 30 minutes
+# The challenge of everyday statistics in 30 minutes
 ### Peter Geelan-Small - Stats Central, UNSW
 ### 29th July, 2021
 
@@ -83,10 +83,10 @@ bottom:-2.5em;left:1em;
 Statistics in research
 
 - May need statistics to get *information* from your data
-- Information includes some indication of how system fits together and associated uncertainty
+- Information includes relationship among system variables with associated uncertainty
 - Start with good design - fancy statistics can't usually fix holes in design
-- At start of study, need a statistical plan of how to analyse results
-- To consult the statistician after an experiment is finished is often merely to ask [them] to conduct a post mortem examination. [They] can perhaps say what the experiment died of. (Ronald Fisher, 1938. *Sankhya* 4: 14-17)
+- At start of study, make a statistical plan of how to analyse data
+- "To consult the statistician after an experiment is finished is often merely to ask [them] to conduct a post mortem examination. [They] can perhaps say what the experiment died of." (Ronald Fisher, 1938. *Sankhya* 4: 14-17)
 
 ---
 
@@ -99,8 +99,8 @@ Statistics in research
     
 How do you know what statistical analysis methods to use?
 - Depends on:
-    - study design - independent data or not
-    - type of outcome variable - continuous, binary, count
+    - study design - data structure, independent data or not, ...
+    - type of outcome variable - quantitative (continuous, proportion, count), categorical (binary, ordered, nominal)
 
 
 ---
@@ -126,252 +126,22 @@ Model names are an accident of history
 
 
 
----
-
-# Linear model: linear regression
-
-
-
-
-Harris (2017): Surgical instrument proficiency
-
-Proficiency in instrument control: Is smooth instrument movement related to error rate in a ring-carrying exercise?
-
-*Outcome:* No. errors per sec. (baseline) - continuous
-
-*Predictor:* Mean jerk (change in acceleration) - continuous
-
-*Data structure:* Independent
-
-*Model:* Linear regression - normal distribution assumption
-
-`$$\mathrm{ErrorRate} = \beta_0 + \beta_1 \; \mathrm{MeanJerk}$$`
-
----
-
-# Linear model: linear regression
-
-
-.pull-left[
-
-&lt;img src="stats_surgical_rsch_soc_2021-07-29_files/figure-html/unnamed-chunk-4-1.png" style="display: block; margin: auto;" /&gt;
-
-
-Some positive skewness
-
-]
-
-.pull-right[
-
-&lt;img src="stats_surgical_rsch_soc_2021-07-29_files/figure-html/unnamed-chunk-5-1.png" style="display: block; margin: auto;" /&gt;
-
-]
 
 
 ---
 
-# Linear model: linear regression
+# Example data and analyses
 
-.pull-left[
+&lt;img src="harris_title.png" width="4408" style="display: block; margin: auto;" /&gt;
 
-&lt;img src="stats_surgical_rsch_soc_2021-07-29_files/figure-html/unnamed-chunk-6-1.png" style="display: block; margin: auto;" /&gt;
+Harris et al. (2017) https://doi.org/10.1371/journal.pone.0188233
 
-]
-
-.pull-right[
-
-- Linear relationship
-- *Variability* of error rate increases with mean jerk
-
-]
-
-
----
-
-# Linear model: linear regression
-
-
-
-```
-##              Estimate Std. Error t value  Pr(&gt;|t|)
-## (Intercept) -0.102935   0.024127 -4.2663 4.077e-05
-## MeanJerk1    3.990533   0.419750  9.5069 3.397e-16
-## 
-## n = 118, p = 2, Residual SE = 0.06182, R-Squared = 0.44
-```
-
-Can we accept this model as valid?
-
-Check the assumptions!
-
-*Assumptions*
-
-- Residuals have constant variance
-- Residuals are normally distributed
-
-
----
-
-# Linear model: linear regression
-
-.pull-left[
-
-Assumption 1: Residuals have constant variance
-
-- Fanning pattern suggests variance not constant
-
-]
-
-
-.pull-right[
-
-&lt;img src="stats_surgical_rsch_soc_2021-07-29_files/figure-html/unnamed-chunk-8-1.png" style="display: block; margin: auto;" /&gt;
-
-]
-
----
-
-# Linear model: linear regression
-
-
-.pull-left[
-
-Assumption 2: Residuals normally distributed
-
-- No gross deviation apparent
-
-]
-
-
-.pull-right[
-
-&lt;img src="stats_surgical_rsch_soc_2021-07-29_files/figure-html/unnamed-chunk-9-1.png" style="display: block; margin: auto;" /&gt;
-
-]
-
-
----
-
-# Linear model: linear regression
-
-
-.pull-left[
-
-Address non-constant variance
-
-- Log-transforming positively skewed outcome may be useful
-- Log transformation maybe a little too strong
-
-]
-
-
-.pull-right[
-
-&lt;img src="stats_surgical_rsch_soc_2021-07-29_files/figure-html/unnamed-chunk-10-1.png" style="display: block; margin: auto;" /&gt;
-
-]
-
-
----
-
-# Linear model: linear regression
-
-.pull-left[
-
-No improvement!
-
-]
-
-.pull-right[
-
-&lt;img src="stats_surgical_rsch_soc_2021-07-29_files/figure-html/unnamed-chunk-11-1.png" style="display: block; margin: auto;" /&gt;
-
-]
-
-
----
-
-# Generalised linear model - Poisson
-
-But "errors per sec." is really a rate
-
-- different types of regression model for different types of outcome variable
-- count over given time intervals  - Poisson distribution (0 is possible value, no upper limit)
-- *generalised* linear model (non-normal outcome variable)
-
-
-
----
-
-# Generalised Linear model - Poisson
-
-
-
-```
-##             Estimate Std. Error z value  Pr(&gt;|z|)
-## (Intercept)  -4.0291     0.1374 -29.323 &lt; 2.2e-16
-## MeanJerk1    32.1147     2.3108  13.897 &lt; 2.2e-16
-## 
-## n = 118 p = 2
-## Deviance = 215.46990 Null Deviance = 387.82392 (Difference = 172.35402)
-```
-
-Can we accept this model as valid?
-
-Check the assumptions!
-
-*Assumptions*
-
-- Quantile residuals have constant variance (constant dispersion)
-- Quantile residuals are normally distributed
-
-
----
-
-# Generalised Linear model - Poisson
-
-&lt;img src="stats_surgical_rsch_soc_2021-07-29_files/figure-html/unnamed-chunk-13-1.png" style="display: block; margin: auto;" /&gt;
-
-
-
----
-
-&lt;img src="stats_surgical_rsch_soc_2021-07-29_files/figure-html/unnamed-chunk-14-1.png" style="display: block; margin: auto;" /&gt;
-
-
----
-
-# Generalised Linear model - Negative binomial
-
-
-
-
-
-&lt;img src="stats_surgical_rsch_soc_2021-07-29_files/figure-html/unnamed-chunk-16-1.png" style="display: block; margin: auto;" /&gt;
-
----
-
-
-&lt;img src="stats_surgical_rsch_soc_2021-07-29_files/figure-html/unnamed-chunk-17-1.png" style="display: block; margin: auto;" /&gt;
-
-
-
----
-
-
-```
-## [1] 659.6025
-```
-
-```
-## [1] 640.9559
-```
 
 ---
 
 # Two independent groups
 
-Is knot-tying time associated with watching an expert demonstration of the technique?
+**Is knot-tying time associated with watching an expert demonstration of the technique?**
 
 *Outcome:* Time (s) to tie a knot - continuous
 
@@ -422,7 +192,7 @@ Is knot-tying time associated with watching an expert demonstration of the techn
 
 .pull-left[
 
-&lt;img src="stats_surgical_rsch_soc_2021-07-29_files/figure-html/unnamed-chunk-20-1.png" style="display: block; margin: auto;" /&gt;
+&lt;img src="stats_surgical_rsch_soc_2021-07-29_files/figure-html/unnamed-chunk-6-1.png" style="display: block; margin: auto;" /&gt;
 
 
 ]
@@ -430,7 +200,7 @@ Is knot-tying time associated with watching an expert demonstration of the techn
 
 .pull-right[
 
-&lt;img src="stats_surgical_rsch_soc_2021-07-29_files/figure-html/unnamed-chunk-21-1.png" style="display: block; margin: auto;" /&gt;
+&lt;img src="stats_surgical_rsch_soc_2021-07-29_files/figure-html/unnamed-chunk-7-1.png" style="display: block; margin: auto;" /&gt;
 
 ]
 
@@ -444,14 +214,14 @@ Positive skew is evident
 
 .pull-left[
 
-&lt;img src="stats_surgical_rsch_soc_2021-07-29_files/figure-html/unnamed-chunk-22-1.png" style="display: block; margin: auto;" /&gt;
+&lt;img src="stats_surgical_rsch_soc_2021-07-29_files/figure-html/unnamed-chunk-8-1.png" style="display: block; margin: auto;" /&gt;
 
 ]
 
 
 .pull-right[
 
-&lt;img src="stats_surgical_rsch_soc_2021-07-29_files/figure-html/unnamed-chunk-23-1.png" style="display: block; margin: auto;" /&gt;
+&lt;img src="stats_surgical_rsch_soc_2021-07-29_files/figure-html/unnamed-chunk-9-1.png" style="display: block; margin: auto;" /&gt;
 
 ]
 
@@ -474,7 +244,7 @@ Data deviates visibly from normal distribution
 
 .pull-right[
 
-&lt;img src="stats_surgical_rsch_soc_2021-07-29_files/figure-html/unnamed-chunk-24-1.png" style="display: block; margin: auto;" /&gt;
+&lt;img src="stats_surgical_rsch_soc_2021-07-29_files/figure-html/unnamed-chunk-10-1.png" style="display: block; margin: auto;" /&gt;
 
 ]
 
@@ -491,7 +261,7 @@ Data deviates visibly from normal distribution
 
 .pull-right[
 
-&lt;img src="stats_surgical_rsch_soc_2021-07-29_files/figure-html/unnamed-chunk-25-1.png" style="display: block; margin: auto;" /&gt;
+&lt;img src="stats_surgical_rsch_soc_2021-07-29_files/figure-html/unnamed-chunk-11-1.png" style="display: block; margin: auto;" /&gt;
 
 ]
 
@@ -502,14 +272,14 @@ Data deviates visibly from normal distribution
 
 .pull-left[
 
-&lt;img src="stats_surgical_rsch_soc_2021-07-29_files/figure-html/unnamed-chunk-26-1.png" style="display: block; margin: auto;" /&gt;
+&lt;img src="stats_surgical_rsch_soc_2021-07-29_files/figure-html/unnamed-chunk-12-1.png" style="display: block; margin: auto;" /&gt;
 
 ]
 
 
 .pull-right[
 
-&lt;img src="stats_surgical_rsch_soc_2021-07-29_files/figure-html/unnamed-chunk-27-1.png" style="display: block; margin: auto;" /&gt;
+&lt;img src="stats_surgical_rsch_soc_2021-07-29_files/figure-html/unnamed-chunk-13-1.png" style="display: block; margin: auto;" /&gt;
 
 ]
 
@@ -558,7 +328,7 @@ Carry out two independent sample `\(t\)` test (data on log scale)
 
 
 
-&lt;table class="table" style="font-size: 20px; margin-left: auto; margin-right: auto;"&gt;
+&lt;table class="table" style="font-size: 18px; margin-left: auto; margin-right: auto;"&gt;
  &lt;thead&gt;
   &lt;tr&gt;
    &lt;th style="text-align:left;"&gt; contrast &lt;/th&gt;
@@ -597,11 +367,11 @@ Using the better model gives smaller estimated standard errors
 
 *Raw data*
 
-&lt;table class="table" style="font-size: 20px; width: auto !important; margin-left: auto; margin-right: auto;"&gt;
+&lt;table class="table" style="font-size: 18px; width: auto !important; margin-left: auto; margin-right: auto;"&gt;
  &lt;thead&gt;
   &lt;tr&gt;
-   &lt;th style="text-align:left;"&gt; Condition2 &lt;/th&gt;
-   &lt;th style="text-align:right;"&gt; emmean &lt;/th&gt;
+   &lt;th style="text-align:left;"&gt; Condition &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Arithmetric.mean &lt;/th&gt;
    &lt;th style="text-align:right;"&gt; SE &lt;/th&gt;
    &lt;th style="text-align:right;"&gt; df &lt;/th&gt;
    &lt;th style="text-align:right;"&gt; lower.CL &lt;/th&gt;
@@ -632,11 +402,11 @@ Using the better model gives smaller estimated standard errors
 *Log-transformed data*
 
 
-&lt;table class="table" style="font-size: 20px; width: auto !important; margin-left: auto; margin-right: auto;"&gt;
+&lt;table class="table" style="font-size: 18px; width: auto !important; margin-left: auto; margin-right: auto;"&gt;
  &lt;thead&gt;
   &lt;tr&gt;
-   &lt;th style="text-align:left;"&gt; Condition2 &lt;/th&gt;
-   &lt;th style="text-align:right;"&gt; response &lt;/th&gt;
+   &lt;th style="text-align:left;"&gt; Condition &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Geometric.mean &lt;/th&gt;
    &lt;th style="text-align:right;"&gt; SE &lt;/th&gt;
    &lt;th style="text-align:right;"&gt; df &lt;/th&gt;
    &lt;th style="text-align:right;"&gt; lower.CL &lt;/th&gt;
@@ -668,7 +438,7 @@ Using the better model gives smaller estimated standard errors
 
 # More than two independent groups
 
-Is knot-tying time associated with observational learning? Compare the control group against each other group.
+**Is knot-tying time associated with observational learning? Compare the control group against each other group.**
 
 *Outcome:* Time (s) to tie a knot - continuous
 
@@ -682,6 +452,24 @@ Is knot-tying time associated with observational learning? Compare the control g
 Multiple two-sample `\(t\)` tests? - No! 
 
 ---
+
+# More than two independent groups
+
+
+Model equation for ANOVA model
+
+
+
+
+`$$\mathrm{Time} = \beta_0 + \beta_1 \, X_{\mathrm{Expert}} + \beta_2 \, X_{\mathrm{Mixed}} + \beta_3 \, X_{\mathrm{Novice}}$$`
+The *X* variables take the value 0 or 1 to show which group an observation is in.
+
+They are "indicator variables" or "dummy variables"
+
+
+---
+
+
 
 # ANOVA: More than 2 independent groups 
 
@@ -706,13 +494,13 @@ Residual in ANOVA = observed data value - group mean
 
 .pull-left[
 
-&lt;img src="stats_surgical_rsch_soc_2021-07-29_files/figure-html/unnamed-chunk-40-1.png" style="display: block; margin: auto;" /&gt;
+&lt;img src="stats_surgical_rsch_soc_2021-07-29_files/figure-html/unnamed-chunk-27-1.png" style="display: block; margin: auto;" /&gt;
 ]
 
 
 .pull-right[
 
-&lt;img src="stats_surgical_rsch_soc_2021-07-29_files/figure-html/unnamed-chunk-41-1.png" style="display: block; margin: auto;" /&gt;
+&lt;img src="stats_surgical_rsch_soc_2021-07-29_files/figure-html/unnamed-chunk-28-1.png" style="display: block; margin: auto;" /&gt;
 
 
 ]
@@ -731,10 +519,10 @@ Residual in ANOVA = observed data value - group mean
 ## Residuals  116 29.4433 0.253821
 ```
 
+
 *Conclusion*
 
 There is no evidence that knot-tying time is associated with observational learning (p = 0.95).
-
 
 ---
 
@@ -744,7 +532,7 @@ There is no evidence that knot-tying time is associated with observational learn
 - If *p* were small, those comparisons would be made and P values would need to be adjusted for multiple comparisons
 
 
-&lt;table class="table" style="font-size: 20px; width: auto !important; margin-left: auto; margin-right: auto;"&gt;
+&lt;table class="table" style="font-size: 18px; width: auto !important; margin-left: auto; margin-right: auto;"&gt;
  &lt;thead&gt;
   &lt;tr&gt;
    &lt;th style="text-align:left;"&gt; contrast &lt;/th&gt;
@@ -780,21 +568,123 @@ There is no evidence that knot-tying time is associated with observational learn
 &lt;/table&gt;
 
 
+- There are particular methods for adjusting P values for specific types of multiple comparisons
+
+---
+
+# ANOVA: More than 2 independent groups 
+
+Model equation (ANOVA is a special case of regression)
+
+&lt;table class="table" style="font-size: 18px; width: auto !important; margin-left: auto; margin-right: auto;"&gt;
+ &lt;thead&gt;
+  &lt;tr&gt;
+   &lt;th style="text-align:left;"&gt;   &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Estimate &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; SE &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; t.value &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; p.value &lt;/th&gt;
+  &lt;/tr&gt;
+ &lt;/thead&gt;
+&lt;tbody&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; (Intercept) &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 3.979 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.092 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 43.261 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.000 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Condition2Expert &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; -0.025 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.130 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; -0.189 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.851 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Condition2Mixed &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.034 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.130 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.261 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.795 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Condition2Novice &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; -0.039 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.130 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; -0.297 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.767 &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+
+
+`$$\mathrm{Time} = \beta_0 + \beta_1 \, X_{\mathrm{Expert}} + \beta_2 \, X_{\mathrm{Mixed}} + \beta_3 \, X_{\mathrm{Novice}}$$`
+
+
+
+
+&lt;table class="table" style="font-size: 18px; width: auto !important; margin-left: auto; margin-right: auto;"&gt;
+ &lt;thead&gt;
+  &lt;tr&gt;
+   &lt;th style="text-align:left;"&gt;   &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Intercept (Control) &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Expert &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Mixed &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Novice &lt;/th&gt;
+  &lt;/tr&gt;
+ &lt;/thead&gt;
+&lt;tbody&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Estimate &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 3.979 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; -0.025 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.034 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; -0.039 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Mean &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 3.979 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 3.955 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 4.013 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 3.941 &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+
+
+
 ---
 
 # Mixed model: repeated measurements
 
-Proficiency in instrument control: Is smooth instrument movement related to observational learning over time?
+**Proficiency in instrument control: Is smooth instrument movement related to observational learning over time?**
 
-*Outcome:* Mean jerk - continuous
+*Outcome:* Mean jerk (change in acceleration) - continuous
 
 *Predictors:*
 - Time (baseline, post-observation, retention) - categorical
-- Training condition (4 groups - control, novice, mixed, expert) - categorical 
+- Training condition (control, novice, mixed, expert) - categorical
+- Time-Condition interaction
 
-*Data structure:* non-independent
+*Data structure:* Non-independent
 
-*Model:* linear mixed model with time-condition interaction - normal distribution assumption
+*Model:* Linear mixed model - normal distribution assumption
+
+
+---
+
+# Mixed model: repeated measurements
+
+*Model equation*
+
+Mean jerk = overall mean + time effect + condition effect + time:condition effect + (subject effect)
+
+- time: 2 dummy variables
+- condition: 3 dummy variables
+- time-condition: 6 dummy variables
+- subject: accounts for grouping of data values by subject (i.e. non-independence)
+
 
 
 ---
@@ -803,20 +693,18 @@ Proficiency in instrument control: Is smooth instrument movement related to obse
 
 
 
----
 
-# Mixed model: repeated measurements
 
 .pull-left[
 
-&lt;img src="stats_surgical_rsch_soc_2021-07-29_files/figure-html/unnamed-chunk-45-1.png" style="display: block; margin: auto;" /&gt;
+&lt;img src="stats_surgical_rsch_soc_2021-07-29_files/figure-html/unnamed-chunk-34-1.png" style="display: block; margin: auto;" /&gt;
 
 ]
 
 .pull-right[
 
 
-&lt;img src="stats_surgical_rsch_soc_2021-07-29_files/figure-html/unnamed-chunk-46-1.png" style="display: block; margin: auto;" /&gt;
+&lt;img src="stats_surgical_rsch_soc_2021-07-29_files/figure-html/unnamed-chunk-35-1.png" style="display: block; margin: auto;" /&gt;
 
 ]
 
@@ -826,18 +714,15 @@ Proficiency in instrument control: Is smooth instrument movement related to obse
 
 .pull-left[
 
-&lt;img src="stats_surgical_rsch_soc_2021-07-29_files/figure-html/unnamed-chunk-47-1.png" style="display: block; margin: auto;" /&gt;
+&lt;img src="stats_surgical_rsch_soc_2021-07-29_files/figure-html/unnamed-chunk-36-1.png" style="display: block; margin: auto;" /&gt;
 
 ]
 
 .pull-right[
 
-&lt;img src="stats_surgical_rsch_soc_2021-07-29_files/figure-html/unnamed-chunk-48-1.png" style="display: block; margin: auto;" /&gt;
+&lt;img src="stats_surgical_rsch_soc_2021-07-29_files/figure-html/unnamed-chunk-37-1.png" style="display: block; margin: auto;" /&gt;
 
 ]
-
-
-
 
 
 
@@ -848,7 +733,7 @@ Proficiency in instrument control: Is smooth instrument movement related to obse
 # Mixed model: repeated measurements
 
 
-&lt;img src="stats_surgical_rsch_soc_2021-07-29_files/figure-html/unnamed-chunk-51-1.png" style="display: block; margin: auto;" /&gt;
+&lt;img src="stats_surgical_rsch_soc_2021-07-29_files/figure-html/unnamed-chunk-39-1.png" style="display: block; margin: auto;" /&gt;
 
 
 
@@ -861,14 +746,483 @@ Proficiency in instrument control: Is smooth instrument movement related to obse
 
 
 .pull-left[
+
+&lt;img src="stats_surgical_rsch_soc_2021-07-29_files/figure-html/unnamed-chunk-41-1.png" style="display: block; margin: auto;" /&gt;
+
+
+]
+
+.pull-right[
+
+&lt;img src="stats_surgical_rsch_soc_2021-07-29_files/figure-html/unnamed-chunk-42-1.png" style="display: block; margin: auto;" /&gt;
+
+]
+
+Some improvement in stabilising variance from log transformation
+
+
+
+
+
+---
+
+
+# Mixed model: repeated measurements
+
+
+.pull-left[
+
+
+Some deviation from normal distribution evident
+
+
+]
+
+
+.pull-right[
+&lt;img src="stats_surgical_rsch_soc_2021-07-29_files/figure-html/unnamed-chunk-44-1.png" style="display: block; margin: auto;" /&gt;
+
+]
+
+
+
+
+---
+
+# Mixed model: repeated measurements
+
+
+&lt;table class="table" style="font-size: 18px; width: auto !important; margin-left: auto; margin-right: auto;"&gt;
+ &lt;thead&gt;
+  &lt;tr&gt;
+   &lt;th style="text-align:left;"&gt;   &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Sum Sq &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Mean Sq &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; NumDF &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; DenDF &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; F value &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Pr(&amp;gt;F) &lt;/th&gt;
+  &lt;/tr&gt;
+ &lt;/thead&gt;
+&lt;tbody&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Condition &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.059 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.020 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 3 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 115.089 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1.230 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.302 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Time &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.344 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.172 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 2 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 227.534 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 10.751 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.000 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Condition:Time &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.058 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.010 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 6 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 227.542 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.600 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.730 &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+
+Condition-Time interaction is not an active predictor (p = 0.73)
+
+
+
+
+
+
+&lt;table class="table" style="font-size: 18px; width: auto !important; margin-left: auto; margin-right: auto;"&gt;
+ &lt;thead&gt;
+  &lt;tr&gt;
+   &lt;th style="text-align:left;"&gt;   &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Sum Sq &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Mean Sq &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; NumDF &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; DenDF &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; F value &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Pr(&amp;gt;F) &lt;/th&gt;
+  &lt;/tr&gt;
+ &lt;/thead&gt;
+&lt;tbody&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Condition &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.058 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.019 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 3 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 115.113 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1.227 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.303 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Time &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.345 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.172 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 2 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 233.544 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 10.910 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.000 &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+
+Training regime is not associated with mean jerk (p = 0.30)
+
+
+---
+
+# Mixed model: repeated measurements
+
+
+.pull-left[
+
+&lt;img src="stats_surgical_rsch_soc_2021-07-29_files/figure-html/unnamed-chunk-49-1.png" style="display: block; margin: auto;" /&gt;
+
+]
+
+.pull-right[
+
+&lt;img src="stats_surgical_rsch_soc_2021-07-29_files/figure-html/unnamed-chunk-50-1.png" style="display: block; margin: auto;" /&gt;
+
+]
+
+Training had no apparent impact as task was simple (Harris et al.).
+
+
+
+---
+
+# Linear model: linear regression
+
+**Proficiency in instrument control: Is smooth instrument movement related to error rate in a ring-carrying exercise?**
+
+*Outcome:* No. errors per sec. (baseline) - continuous
+
+*Predictor:* Mean jerk (change in acceleration) - continuous
+
+*Data structure:* Independent
+
+*Model:* Linear regression - normal distribution assumption
+
+`$$\mathrm{ErrorRate} = \beta_0 + \beta_1 \; \mathrm{MeanJerk}$$`
+
+
+---
+
+# Linear model: linear regression
+
+
+Data
+
+&lt;table class="table" style="font-size: 18px; width: auto !important; margin-left: auto; margin-right: auto;"&gt;
+ &lt;thead&gt;
+  &lt;tr&gt;
+   &lt;th style="text-align:right;"&gt; Participant &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; ERRORS.SEC_RT1 &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; RT1Errors &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; RT1Time &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; MeanJerk1 &lt;/th&gt;
+  &lt;/tr&gt;
+ &lt;/thead&gt;
+&lt;tbody&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:right;"&gt; 1 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.060 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 9 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 149.37 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.044 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:right;"&gt; 3 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.150 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 7 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 46.67 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.073 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:right;"&gt; 4 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.094 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 11 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 116.52 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.041 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:right;"&gt; 5 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.198 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 10 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 50.62 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.068 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:right;"&gt; 6 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.127 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 12 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 94.35 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.048 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:right;"&gt; 7 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.161 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 15 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 92.97 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.048 &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+
+
+---
+
+# Linear model: linear regression
+
+
+.pull-left[
+
+&lt;img src="stats_surgical_rsch_soc_2021-07-29_files/figure-html/unnamed-chunk-52-1.png" style="display: block; margin: auto;" /&gt;
+
+
+Some positive skewness
+
+]
+
+.pull-right[
 
 &lt;img src="stats_surgical_rsch_soc_2021-07-29_files/figure-html/unnamed-chunk-53-1.png" style="display: block; margin: auto;" /&gt;
 
 ]
 
-.pull-right[
+
+---
+
+# Linear model: linear regression
+
+.pull-left[
 
 &lt;img src="stats_surgical_rsch_soc_2021-07-29_files/figure-html/unnamed-chunk-54-1.png" style="display: block; margin: auto;" /&gt;
+
+]
+
+.pull-right[
+
+- Linear relationship
+- *Variability* of error rate increases with mean jerk
+
+]
+
+
+---
+
+# Linear model: linear regression
+
+
+
+```
+##              Estimate Std. Error t value  Pr(&gt;|t|)
+## (Intercept) -0.102935   0.024127 -4.2663 4.077e-05
+## MeanJerk1    3.990533   0.419750  9.5069 3.397e-16
+## 
+## n = 118, p = 2, Residual SE = 0.06182, R-Squared = 0.44
+```
+
+Can we accept this model as valid?
+
+Check the assumptions!
+
+*Assumptions*
+
+- Residuals have constant variance
+- Residuals are normally distributed
+
+
+---
+
+# Linear model: linear regression
+
+.pull-left[
+
+Assumption 1: Residuals have constant variance
+
+- Fanning pattern suggests variance not constant
+
+]
+
+
+.pull-right[
+
+&lt;img src="stats_surgical_rsch_soc_2021-07-29_files/figure-html/unnamed-chunk-56-1.png" style="display: block; margin: auto;" /&gt;
+
+]
+
+---
+
+# Linear model: linear regression
+
+
+.pull-left[
+
+Assumption 2: Residuals normally distributed
+
+- No gross deviation apparent
+
+]
+
+
+.pull-right[
+
+&lt;img src="stats_surgical_rsch_soc_2021-07-29_files/figure-html/unnamed-chunk-57-1.png" style="display: block; margin: auto;" /&gt;
+
+]
+
+
+
+
+---
+
+# Linear model: linear regression
+
+
+.pull-left[
+
+Address non-constant variance
+
+- Log-transforming positively skewed outcome may be useful
+- Log transformation maybe a little too strong
+
+]
+
+
+.pull-right[
+
+&lt;img src="stats_surgical_rsch_soc_2021-07-29_files/figure-html/unnamed-chunk-59-1.png" style="display: block; margin: auto;" /&gt;
+
+]
+
+
+---
+
+# Linear model: linear regression
+
+.pull-left[
+
+Log transformation has stabilised variance to some degree
+
+]
+
+.pull-right[
+
+&lt;img src="stats_surgical_rsch_soc_2021-07-29_files/figure-html/unnamed-chunk-60-1.png" style="display: block; margin: auto;" /&gt;
+
+]
+
+---
+
+# Linear model: linear regression
+
+Model with log-transformed response variable
+
+
+```
+##             Estimate Std. Error  t value  Pr(&gt;|t|)
+## (Intercept) -4.31634    0.23699 -18.2134 &lt; 2.2e-16
+## MeanJerk1   34.78251    4.12292   8.4364 1.051e-13
+## 
+## n = 118, p = 2, Residual SE = 0.60724, R-Squared = 0.38
+```
+
+---
+
+# Generalised linear model - Poisson
+
+But "errors per sec." is really a rate ...
+
+- different types of regression model for different types of outcome variable
+- count over given time intervals  - Poisson distribution (integer values, 0 is a possible value, no upper limit)
+- *generalised* linear model (non-normal outcome variable)
+
+
+
+---
+
+# Generalised linear model - Poisson
+
+
+
+```
+##             Estimate Std. Error z value  Pr(&gt;|z|)
+## (Intercept)  -4.0291     0.1374 -29.323 &lt; 2.2e-16
+## MeanJerk1    32.1147     2.3108  13.897 &lt; 2.2e-16
+## 
+## n = 118 p = 2
+## Deviance = 215.46990 Null Deviance = 387.82392 (Difference = 172.35402)
+```
+
+*Model equation*
+
+`$$\log{Y} = \beta_0 + \beta_1 X$$`
+$$\log{\mathrm{(No. of \; errors)}} = \beta_0 + \beta_1 \mathrm{MeanJerk} + \log{\mathrm{(Time \; period)}} $$
+
+Must add "time period" adjustment, as each participant's time to complete was different
+
+
+---
+
+# Generalised linear model - Poisson
+
+Check the assumptions!
+
+*Assumptions*
+
+- Quantile residuals have constant variance (constant dispersion)
+- Quantile residuals are normally distributed
+- Overdispersion not present
+
+
+---
+
+# Generalised linear model - Poisson
+
+.pull.left[
+
+&lt;img src="stats_surgical_rsch_soc_2021-07-29_files/figure-html/unnamed-chunk-63-1.png" style="display: block; margin: auto;" /&gt;
+
+]
+
+.pull-right[
+
+
+&lt;img src="stats_surgical_rsch_soc_2021-07-29_files/figure-html/unnamed-chunk-64-1.png" style="display: block; margin: auto;" /&gt;
+
+]
+
+Constant variance and normal distribution assumptions are quite well satisfied
+
+---
+
+# Errors per sec. - which model?
+
+
+
+
+
+.pull-left[
+
+&lt;img src="stats_surgical_rsch_soc_2021-07-29_files/figure-html/unnamed-chunk-66-1.png" style="display: block; margin: auto;" /&gt;
+
+]
+
+.pull-right[
+
+&lt;img src="stats_surgical_rsch_soc_2021-07-29_files/figure-html/unnamed-chunk-67-1.png" style="display: block; margin: auto;" /&gt;
 
 ]
 
@@ -882,109 +1236,19 @@ Proficiency in instrument control: Is smooth instrument movement related to obse
 
 
 
----
-
-# Outline
-
-Continuous outcome - normal distribn
-
-Mean jerk - *plot data*
-
-Compare baseline to post-observation to retention
-
-Data not independent
-
-Mean jerk - *plot data*
-
-- categorical predictor - three times - mixed model
-    - assumptions
 
 
----
-
-# Outline
-
-Continuous outcome - normal distribn
-
-Mean jerk - *plot data*
-
-Compare baseline to post-observation
-
-Data not independent
-
-Mean jerk - *plot data*
-
-- categorical predictor - two times - paired t test
-    - assumptions
-
----
-
-# Outline
-
-Categorical outcome
-
-Independent data
-
-Knot-tying skill (sat or unsat) - - *plot data*
-
-Is there an association with condition?
-
-Pearson's `\(\chi^2\)` test
-- assumptions
-
----
-
-# Outline
-
-Kinoshita
-
-POD
-
-Binary outcome
-
-Is there an association between NLR &lt;/&gt;= 3 ad POD?
-
-Pearson's `\(\chi^2\)` test
-- assumptions
-
-Can't estimate parameter or use controlling variables
 
 
----
-
-# Outline
-
-Kinoshita
-
-POD
-
-Binary outcome
-
-- categorical predictor - NLR
-- controlling variable - ACCI
 
 
----
-
-# Outline
 
 
-ICDSC score - 1, 2, ... , 6
 
-"Quantitative" outcome - or is it?
 
-Predictor - NLR - continuous or categorical (by interval)?
 
-Normal assumption untenable
 
-- non-parametric method - Kruskal-Wallis
-    - compare NLR levels against lowest (Dunn's test)
-    
-- ordered categorical variable - ordinal logistic regression
-    - NLR categories
-    - NLR continuous
-    
-    
+
   
 ---
 

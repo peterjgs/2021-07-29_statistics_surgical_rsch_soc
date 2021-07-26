@@ -1,0 +1,58 @@
+Further ideas for analyses for Surgical Research Society
+
+These were not included in the talk.
+
+
+---
+
+# Outline
+
+Kinoshita
+
+POD
+
+Binary outcome
+
+Is there an association between NLR <=/> 3 and POD?
+
+Pearson's $\chi^2$ test
+- assumptions
+
+Can't estimate parameter or use controlling variables
+
+
+---
+
+# Outline
+
+Kinoshita
+
+POD
+
+Binary outcome
+
+- categorical predictor - NLR
+- controlling variable - ACCI
+
+
+---
+
+# Outline
+
+
+ICDSC score - 1, 2, ... , 6
+
+"Quantitative" outcome - or is it?
+
+Predictor - NLR - continuous or categorical (by interval)?
+
+Normal assumption untenable
+
+- non-parametric method - Kruskal-Wallis
+    - compare NLR levels against lowest (Dunn's test)
+    
+- ordered categorical variable - ordinal logistic regression
+    - NLR categories
+    - NLR continuous
+    
+    

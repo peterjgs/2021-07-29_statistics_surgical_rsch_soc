@@ -1,5 +1,5 @@
 ---
-title: "Everyday statistics in 30 minutes"
+title: "The challenge of everyday statistics in 30 minutes"
 author: "Peter Geelan-Small - Stats Central, UNSW"
 date: "29th July, 2021"
 output:
@@ -54,6 +54,8 @@ library(faraway)  ## For "sumary"
 library(statmod)
 library(lme4)
 library(lmerTest)
+library(sjPlot)
+library(ggeffects)
 library(GGally)
 library(plotly)
 library(reshape2)  ## For "acast"
@@ -78,10 +80,10 @@ library(emmeans)
 Statistics in research
 
 - May need statistics to get *information* from your data
-- Information includes some indication of how system fits together and associated uncertainty
+- Information includes relationship among system variables with associated uncertainty
 - Start with good design - fancy statistics can't usually fix holes in design
-- At start of study, need a statistical plan of how to analyse results
-- To consult the statistician after an experiment is finished is often merely to ask [them] to conduct a post mortem examination. [They] can perhaps say what the experiment died of. (Ronald Fisher, 1938. *Sankhya* 4: 14-17)
+- At start of study, make a statistical plan of how to analyse data
+- "To consult the statistician after an experiment is finished is often merely to ask [them] to conduct a post mortem examination. [They] can perhaps say what the experiment died of." (Ronald Fisher, 1938. *Sankhya* 4: 14-17)
 
 ---
 
@@ -94,8 +96,8 @@ Statistics in research
     
 How do you know what statistical analysis methods to use?
 - Depends on:
-    - study design - independent data or not
-    - type of outcome variable - continuous, binary, count
+    - study design - data structure, independent data or not, ...
+    - type of outcome variable - quantitative (continuous, proportion, count), categorical (binary, ordered, nominal)
 
 
 ---
@@ -131,11 +133,6 @@ wordcloud(words = words_df[ , 1], freq = words_df[ , 2],
 ```
 
 
-
----
-
-# Linear model: linear regression
-
 ```{r}
 
 ## Load data
@@ -147,391 +144,24 @@ load("../data/kinoshita_data_obj.RData")
 ```
 
 
-Harris (2017): Surgical instrument proficiency
-
-Proficiency in instrument control: Is smooth instrument movement related to error rate in a ring-carrying exercise?
-
-*Outcome:* No. errors per sec. (baseline) - continuous
-
-*Predictor:* Mean jerk (change in acceleration) - continuous
-
-*Data structure:* Independent
-
-*Model:* Linear regression - normal distribution assumption
-
-$$\mathrm{ErrorRate} = \beta_0 + \beta_1 \; \mathrm{MeanJerk}$$
-
 ---
 
-# Linear model: linear regression
-
-
-.pull-left[
+# Example data and analyses
 
 ```{r}
 
-p_surg_err <- 
-  ggplot(surg, aes(x = "", y = ERRORS.SEC_RT1)) +
-  geom_boxplot(outlier.shape = NA, width = 0.4) +  # avoid plotting outliers twice
-  geom_jitter(position = position_jitter(width = 0.1, height = 0.1)) +
-  labs(x = "", y = "Error per sec.") +
-  theme_classic()
-
-print(p_surg_err)
-
+knitr::include_graphics("harris_title.png")
 
 ```
 
+Harris et al. (2017) https://doi.org/10.1371/journal.pone.0188233
 
-Some positive skewness
-
-]
-
-.pull-right[
-
-```{r}
-
-p_surg_jerk <- 
-  ggplot(surg, aes(x = "", y = MeanJerk1)) +
-  geom_boxplot(outlier.shape = NA, width = 0.4) +  # avoid plotting outliers twice
-  geom_jitter(position = position_jitter(width = 0.1, height = 0.1)) +
-  labs(x = "", y = "Mean jerk (m/s^3)") +
-  theme_classic()
-
-print(p_surg_jerk)
-
-```
-
-]
-
-
----
-
-# Linear model: linear regression
-
-.pull-left[
-
-```{r}
-
-# Chunk option: out.width = "50%"
-
-
-p_surg_err_jerk <- 
-  ggplot(surg_sub1, aes(x = MeanJerk1, y = ERRORS.SEC_RT1)) +
-  geom_point() +
-  labs(x = "Mean jerk (m/s^3)", y = "Errors per sec.") +
-  theme_classic()
-
-print(p_surg_err_jerk)
-
-```
-
-]
-
-.pull-right[
-
-- Linear relationship
-- *Variability* of error rate increases with mean jerk
-
-]
-
-
----
-
-# Linear model: linear regression
-
-
-```{r}
-
-err.lm1 <- lm(ERRORS.SEC_RT1 ~ MeanJerk1, data = surg_sub1)
-
-#anova(err.lm1)
-
-sumary(err.lm1)
-
-```
-
-Can we accept this model as valid?
-
-Check the assumptions!
-
-*Assumptions*
-
-- Residuals have constant variance
-- Residuals are normally distributed
-
-
----
-
-# Linear model: linear regression
-
-.pull-left[
-
-Assumption 1: Residuals have constant variance
-
-- Fanning pattern suggests variance not constant
-
-]
-
-
-.pull-right[
-
-```{r}
-
-res_fit_err1_df <- data.frame(sres = rstandard(err.lm1),
-                              fit = fitted(err.lm1))
-
-p_res_fit_err1 <- 
-  ggplot(res_fit_err1_df, aes(x = fit, y = sres)) +
-  geom_point() +
-  labs(x = "Fitted values", y = "Standardised residuals") +
-  ggtitle("Raw outcome") +
-  theme_classic()
-
-print(p_res_fit_err1)
-
-```
-
-]
-
----
-
-# Linear model: linear regression
-
-
-.pull-left[
-
-Assumption 2: Residuals normally distributed
-
-- No gross deviation apparent
-
-]
-
-
-.pull-right[
-
-```{r}
-
-p_qq_err1 <- 
-  ggplot(res_fit_err1_df, aes(sample = sres)) +
-  geom_qq() +
-  geom_qq_line() +
-  labs(x = "Normal quantile", y = "Sample quantile") +
-  theme_classic()
-
-print(p_qq_err1)
-
-```
-
-]
-
-
----
-
-# Linear model: linear regression
-
-
-.pull-left[
-
-Address non-constant variance
-
-- Log-transforming positively skewed outcome may be useful
-- Log transformation maybe a little too strong
-
-]
-
-
-.pull-right[
-
-```{r}
-
-surg$logERRORS.SEC_RT1 <- log(surg$ERRORS.SEC_RT1 )
-
-ggplot(surg, aes(x = "", y = logERRORS.SEC_RT1)) +
-  geom_boxplot(outlier.shape = NA, width = 0.4) +  # avoid plotting outliers twice
-  geom_jitter(position = position_jitter(width = 0.1, height = 0.1))
-
-```
-
-]
-
-
----
-
-# Linear model: linear regression
-
-.pull-left[
-
-No improvement!
-
-]
-
-.pull-right[
-
-```{r}
-
-
-err.lm2 <- lm(logERRORS.SEC_RT1 ~ MeanJerk1, data = surg_sub1)
-
-res_fit_err2_df <- data.frame(sres = rstandard(err.lm2),
-                              fit = fitted(err.lm2))
-
-
-p_res_fit_err2 <- 
-  ggplot(res_fit_err2_df, aes(x = fit, y = sres)) +
-  geom_point() +
-  labs(x = "Fitted values", y = "Standardised residuals") +
-  ggtitle("Log-transformed outcome") +
-  theme_classic()
-
-print(p_res_fit_err2)
-
-```
-
-]
-
-
----
-
-# Generalised linear model - Poisson
-
-But "errors per sec." is really a rate
-
-- different types of regression model for different types of outcome variable
-- count over given time intervals  - Poisson distribution (0 is possible value, no upper limit)
-- *generalised* linear model (non-normal outcome variable)
-
-
-
----
-
-# Generalised Linear model - Poisson
-
-
-```{r}
-
-err.glm1 <- glm(RT1Errors ~ MeanJerk1 + offset(log(RT1Time)),
-                family = poisson, data = surg)
-
-sumary(err.glm1)
-
-```
-
-Can we accept this model as valid?
-
-Check the assumptions!
-
-*Assumptions*
-
-- Quantile residuals have constant variance (constant dispersion)
-- Quantile residuals are normally distributed
-
-
----
-
-# Generalised Linear model - Poisson
-
-```{r}
-
-res_fit_err_glm1_df <- data.frame(res = qresiduals(err.glm1),
-                                  fit = fitted(err.glm1))
-
-p_res_fit_err_glm1 <- 
-  ggplot(res_fit_err_glm1_df, aes(x = fit, y = res)) +
-  geom_point() +
-  labs(x = "Fitted values", y = "Standardised residuals") +
-  ggtitle("Poisson model") +
-  theme_classic()
-
-print(p_res_fit_err_glm1)
-
-
-```
-
-
-
----
-
-```{r}
-
-p_qq_err_glm1 <- 
-  ggplot(res_fit_err_glm1_df, aes(sample = res)) +
-  geom_qq() +
-  geom_qq_line() +
-  labs(x = "Normal quantile", y = "Sample quantile") +
-  ggtitle("Poisson model") +
-  theme_classic()
-
-print(p_qq_err_glm1)
-
-```
-
-
----
-
-# Generalised Linear model - Negative binomial
-
-```{r}
-
-err.glm2 <- glm.nb(RT1Errors ~ MeanJerk1 + offset(log(RT1Time)),
-                   data = surg)
-
-#summary(err.glm2)
-
-```
-
-
-
-```{r}
-
-res_fit_err_glm2_df <- data.frame(res = qresiduals(err.glm2),
-                                  fit = fitted(err.glm2))
-
-p_res_fit_err_glm2 <- 
-  ggplot(res_fit_err_glm2_df, aes(x = fit, y = res)) +
-  geom_point() +
-  labs(x = "Fitted values", y = "Standardised residuals") +
-  ggtitle("Negative binomial model") +
-  theme_classic()
-
-print(p_res_fit_err_glm2)
-
-```
-
----
-
-
-```{r}
-
-p_qq_err_glm2 <- 
-  ggplot(res_fit_err_glm2_df, aes(sample = res)) +
-  geom_qq() +
-  geom_qq_line() +
-  labs(x = "Normal quantile", y = "Sample quantile") +
-  ggtitle("Negative binomial model") +
-  theme_classic()
-
-print(p_qq_err_glm2)
-
-```
-
-
-
----
-
-```{r}
-
-BIC(err.glm1)
-
-BIC(err.glm2)
-
-```
 
 ---
 
 # Two independent groups
 
-Is knot-tying time associated with watching an expert demonstration of the technique?
+**Is knot-tying time associated with watching an expert demonstration of the technique?**
 
 *Outcome:* Time (s) to tie a knot - continuous
 
@@ -689,8 +319,8 @@ Data deviates visibly from normal distribution
 ggplot(ktime2, aes(x = "", y = logKTTime)) +
   geom_boxplot(outlier.shape = NA, width = 0.4) +  # avoid plotting outliers twice
   geom_jitter(position = position_jitter(width = 0.1, height = 0)) +
-  labs(x = "", y = "Time (s)") +
-  ggtitle("Knot-tying time - log-tranformed data") +
+  labs(x = "", y = "log(Time (s))") +
+  ggtitle("Knot-tying time - log-transformed data") +
   theme_classic()
 
 ```
@@ -715,7 +345,7 @@ ggplot(ktime2, aes(x = "", y = logKTTime)) +
 ggplot(ktime2, aes(x = Condition2, y = logKTTime)) +
   geom_boxplot(outlier.shape = NA, width = 0.4) +  # avoid plotting outliers twice
   geom_jitter(position = position_jitter(width = 0.1, height = 0)) +
-  labs(x = "Condition", y = "Time (s)") +
+  labs(x = "Condition", y = "log(Time (s))") +
   ggtitle("Knot-tying time by group - log-transformed data") +
   theme_classic()
 
@@ -871,7 +501,7 @@ kt.emm2a <- emmeans(kt.lm2, pairwise ~ Condition2)
 as.data.frame(kt.emm2a$contrasts) %>%
   mutate(across(where(is.numeric), round, 3)) %>%
   kbl() %>%
-  kable_styling(font_size = 20)
+  kable_styling(font_size = 18)
 
 ```
 
@@ -894,9 +524,11 @@ Using the better model gives smaller estimated standard errors
 ```{r}
 
 as.data.frame(kt.emm1$emmeans) %>%
+  rename(Condition = Condition2) %>%
+  rename(Arithmetric.mean = emmean) %>%
   mutate(across(where(is.numeric), round, 2)) %>%
   kbl() %>%
-  kable_styling(full_width = F, font_size = 20)
+  kable_styling(full_width = F, font_size = 18)
 
 ```
 
@@ -907,9 +539,11 @@ as.data.frame(kt.emm1$emmeans) %>%
 ```{r}
 
 as.data.frame(kt.emm2$emmeans) %>%
+  rename(Condition = Condition2) %>%
+  rename(Geometric.mean = response) %>%
   mutate(across(where(is.numeric), round, 2)) %>%
   kbl() %>%
-  kable_styling(full_width = F, font_size = 20)
+  kable_styling(full_width = F, font_size = 18)
 
 ```
 
@@ -918,7 +552,7 @@ as.data.frame(kt.emm2$emmeans) %>%
 
 # More than two independent groups
 
-Is knot-tying time associated with observational learning? Compare the control group against each other group.
+**Is knot-tying time associated with observational learning? Compare the control group against each other group.**
 
 *Outcome:* Time (s) to tie a knot - continuous
 
@@ -932,6 +566,46 @@ Is knot-tying time associated with observational learning? Compare the control g
 Multiple two-sample $t$ tests? - No! 
 
 ---
+
+# More than two independent groups
+
+
+Model equation for ANOVA model
+
+```{r}
+
+kt_mod_mat <- model.matrix(lm(KTTime ~ Condition2, 
+                                        data = surg)
+                           )
+
+kt_mod_mat_df <- head(kt_mod_mat)
+
+kt_mod_mat_df <- data.frame(Condition = surg$Condition2[1:6], kt_mod_mat_df)
+
+kt_mod_mat_df <-
+  kt_mod_mat_df %>%
+  rename(Intercept = X.Intercept.) %>%
+  rename(Expert = Condition2Expert) %>%
+  rename(Mixed = Condition2Mixed) %>%
+  rename(Novice = Condition2Novice) %>%
+  kbl() %>%
+  kable_paper(full_width = F) %>%
+  column_spec(1, bold = T, color = "white", background = "#995533")
+
+                            
+
+```
+
+
+$$\mathrm{Time} = \beta_0 + \beta_1 \, X_{\mathrm{Expert}} + \beta_2 \, X_{\mathrm{Mixed}} + \beta_3 \, X_{\mathrm{Novice}}$$
+The *X* variables take the value 0 or 1 to show which group an observation is in.
+
+They are "indicator variables" or "dummy variables"
+
+
+---
+
+
 
 # ANOVA: More than 2 independent groups 
 
@@ -958,12 +632,14 @@ Residual in ANOVA = observed data value - group mean
 
 ```{r}
 
-ggplot(surg, aes(x = Condition2, y = KTTime)) +
+ggplot(surg, aes(x = Condition2, y = KTTime, colour = Condition2)) +
   geom_boxplot(outlier.shape = NA, width = 0.4) +  # avoid plotting outliers twice
   geom_jitter(position = position_jitter(width = 0.1, height = 0)) +
   labs(x = "Condition", y = "Time (s)") +
   ggtitle("Knot-tying time by group - raw data") +
-  theme_classic()
+  theme_classic() +
+  theme(legend.position = "None")
+
 
 ```
 ]
@@ -973,12 +649,13 @@ ggplot(surg, aes(x = Condition2, y = KTTime)) +
 
 ```{r}
 
-ggplot(surg, aes(x = Condition2, y = logKTTime)) +
+ggplot(surg, aes(x = Condition2, y = logKTTime, colour = Condition2)) +
   geom_boxplot(outlier.shape = NA, width = 0.4) +  # avoid plotting outliers twice
   geom_jitter(position = position_jitter(width = 0.1, height = 0)) +
   labs(x = "Condition", y = "Time (s)") +
   ggtitle("Knot-tying time by group - log-transformed data") +
-  theme_classic()
+  theme_classic() +
+  theme(legend.position = "None")
 
 ```
 
@@ -997,10 +674,10 @@ anova(kt.lm3)
 
 ```
 
+
 *Conclusion*
 
 There is no evidence that knot-tying time is associated with observational learning (p = 0.95).
-
 
 ---
 
@@ -1033,27 +710,96 @@ kt.emm3.comb <- data.frame(kt.emm3.nadj,
 as.data.frame(kt.emm3.comb) %>%
   mutate(across(where(is.numeric), round, 2)) %>%
   kbl() %>%
-  kable_styling(full_width = F, font_size = 20)
+  kable_styling(full_width = F, font_size = 18)
 
 
 ```
+
+
+- There are particular methods for adjusting P values for specific types of multiple comparisons
+
+---
+
+# ANOVA: More than 2 independent groups 
+
+Model equation (ANOVA is a special case of regression)
+
+```{r}
+
+kt.sum3 <- data.frame(summary(kt.lm3)$coef) 
+
+kt.sum3 %>%
+  rename(SE = Std..Error) %>%
+  rename(p.value = Pr...t..) %>%
+  mutate(across(where(is.numeric), round, 3)) %>%
+  kbl() %>%
+  kable_styling(full_width = F, font_size = 18)
+
+
+```
+
+
+$$\mathrm{Time} = \beta_0 + \beta_1 \, X_{\mathrm{Expert}} + \beta_2 \, X_{\mathrm{Mixed}} + \beta_3 \, X_{\mathrm{Novice}}$$
+
+
+
+
+```{r}
+
+kt.emm3 <- as.data.frame(emmeans(kt.lm3, ~ Condition2))
+
+kt.emm3.mean <- kt.emm3$emmean
+
+kt.est.coef <- data.frame(rbind(kt.lm3$coef, kt.emm3.mean))
+
+rownames(kt.est.coef) <- c("Estimate", "Mean")
+
+names(kt.est.coef)[1] <- "Intercept (Control)"
+
+kt.est.coef %>%
+  #rename(Intercept(Control) = X.Intercept.) %>%
+  rename(Expert = Condition2Expert) %>%
+  rename(Mixed = Condition2Mixed) %>%
+  rename(Novice = Condition2Novice) %>%
+  mutate(across(where(is.numeric), round, 3)) %>%
+  kbl() %>%
+  kable_styling(full_width = F, font_size = 18)
+
+```
+
 
 
 ---
 
 # Mixed model: repeated measurements
 
-Proficiency in instrument control: Is smooth instrument movement related to observational learning over time?
+**Proficiency in instrument control: Is smooth instrument movement related to observational learning over time?**
 
-*Outcome:* Mean jerk - continuous
+*Outcome:* Mean jerk (change in acceleration) - continuous
 
 *Predictors:*
 - Time (baseline, post-observation, retention) - categorical
-- Training condition (4 groups - control, novice, mixed, expert) - categorical 
+- Training condition (control, novice, mixed, expert) - categorical
+- Time-Condition interaction
 
-*Data structure:* non-independent
+*Data structure:* Non-independent
 
-*Model:* linear mixed model with time-condition interaction - normal distribution assumption
+*Model:* Linear mixed model - normal distribution assumption
+
+
+---
+
+# Mixed model: repeated measurements
+
+*Model equation*
+
+Mean jerk = overall mean + time effect + condition effect + time:condition effect + (subject effect)
+
+- time: 2 dummy variables
+- condition: 3 dummy variables
+- time-condition: 6 dummy variables
+- subject: accounts for grouping of data values by subject (i.e. non-independence)
+
 
 
 ---
@@ -1074,8 +820,8 @@ jerk_mean1 <-
 
 jerk_mean1 <- 
     jerk_mean1 %>%
-    mutate(Trial2 = ifelse(Trial == "MeanJerk1", "Baseline",
-                           ifelse(Trial == "MeanJerk2", "Post", 
+    mutate(Time = ifelse(Trial == "MeanJerk1", "Baseline",
+                         ifelse(Trial == "MeanJerk2", "Post", 
                                   "Retention")))
 
 #head(jerk_mean1) 
@@ -1084,17 +830,19 @@ jerk_mean1 <-
 
 condit3 <- rep(surg$Condition2, each = 3)
 
-jerk_mean2 <- data.frame(jerk_mean1, Condition2 = condit3)
+#stereo3 <- rep(surg$Stereoscore, each = 3)
+
+jerk_mean2 <- data.frame(jerk_mean1, Condition = condit3)
 
 #jerk_mean2[1:30, ]
 
 jerk_mean2$Participant <- factor(jerk_mean2$Participant)
 
-jerk_mean2$Trial2 <- factor(jerk_mean2$Trial2)
+jerk_mean2$Time <- factor(jerk_mean2$Time)
 
-jerk_mean2$Condition2 <- factor(
-    jerk_mean2$Condition2, 
-    levels = c("Novice", "Expert", "Mixed", "Control"))
+jerk_mean2$Condition <- factor(
+    jerk_mean2$Condition, 
+    levels = c( "Control", "Novice", "Mixed", "Expert"))
 
 rm(jerk_mean1)
 
@@ -1102,19 +850,18 @@ rm(jerk_mean1)
 
 ```
 
----
 
-# Mixed model: repeated measurements
 
 .pull-left[
 
 ```{r}
 
-ggplot(jerk_mean2, aes(x = Trial2, y = MeanJerk)) + 
+ggplot(jerk_mean2, aes(x = Time, y = MeanJerk, colour = Time)) + 
   geom_boxplot(outlier.shape = NA, width = 0.4) +  # avoid plotting outliers twice 
   geom_jitter(position = position_jitter(width = 0.1, height = 0)) + 
-  labs(x = "Time", y = "Jerk (m/s^3)") +
-  theme_classic()
+  labs(x = "Time", y = "Mean jerk (m/s^3)") +
+  theme_classic() +
+  theme(legend.position = "None")
 
 ```
 
@@ -1125,11 +872,12 @@ ggplot(jerk_mean2, aes(x = Trial2, y = MeanJerk)) +
 
 ```{r}
 
-ggplot(jerk_mean2, aes(x = Condition2, y = MeanJerk)) + 
+ggplot(jerk_mean2, aes(x = Condition, y = MeanJerk, colour = Condition)) + 
   geom_boxplot(outlier.shape = NA, width = 0.4) +  # avoid plotting outliers twice 
   geom_jitter(position = position_jitter(width = 0.1, height = 0)) + 
-  labs(x = "Training condition", y = "Jerk (m/s^3)") +
-  theme_classic()
+  labs(x = "Training condition", y = "Mean jerk (m/s^3)") +
+  theme_classic() +
+  theme(legend.position = "None")
 
 
 ```
@@ -1144,10 +892,10 @@ ggplot(jerk_mean2, aes(x = Condition2, y = MeanJerk)) +
 
 ```{r}
 
-ggplot(jerk_mean2, aes(x = Trial2, y = MeanJerk, colour = Condition2)) +
+ggplot(jerk_mean2, aes(x = Time, y = MeanJerk, colour = Condition)) +
   geom_boxplot(outlier.shape = NA) +  # avoid plotting outliers twice
   geom_point(alpha = 0.5, size = 1, position = position_jitterdodge()) +
-  labs(x = "Time", y = "Jerk (m/s^3)", colour = "Condition") +
+  labs(x = "Time", y = "Mean jerk (m/s^3)", colour = "Condition") +
   #guides(fill = guide_legend(title = "Condition")) +
   ggtitle("Mean jerk - raw data") +
   theme_classic() 
@@ -1165,10 +913,10 @@ jerk_mean2 <-
   na.omit() %>%
   mutate(logMeanJerk = log(MeanJerk))
 
-ggplot(jerk_mean2, aes(x = Trial2, y = logMeanJerk, colour = Condition2)) +
+ggplot(jerk_mean2, aes(x = Time, y = logMeanJerk, colour = Condition)) +
   geom_boxplot(outlier.shape = NA) +  # avoid plotting outliers twice
   geom_point(alpha = 0.5, size = 1, position = position_jitterdodge()) +
-  labs(x = "Time", y = "Jerk (m/s^3)", colour = "Condition") +
+  labs(x = "Time", y = "Mean jerk (m/s^3)", colour = "Condition") +
   #guides(fill = guide_legend(title = "Condition")) +
   ggtitle("Mean jerk - log-transformed data") +
   theme_classic() 
@@ -1179,10 +927,10 @@ ggplot(jerk_mean2, aes(x = Trial2, y = logMeanJerk, colour = Condition2)) +
 
 ```{r eval = F}
 
-ggplot(jerk_mean2, aes(x = Condition2, y = logMeanJerk, colour = Trial2)) +
+ggplot(jerk_mean2, aes(x = Condition, y = logMeanJerk, colour = Time)) +
   geom_boxplot(outlier.shape = NA) +  # avoid plotting outliers twice
   geom_point(alpha = 0.5, size = 1, position = position_jitterdodge()) +
-  labs(x = "Time", y = "Jerk (m/s^3)", colour = "Trial") +
+  labs(x = "Time", y = "Mean jerk (m/s^3)", colour = "Trial") +
   #guides(fill = guide_legend(title = "Condition")) +
   ggtitle("Mean jerk - log-transformed data") +
   theme_classic() 
@@ -1190,13 +938,6 @@ ggplot(jerk_mean2, aes(x = Condition2, y = logMeanJerk, colour = Trial2)) +
 ```
 
 
-```{r eval = F}
-
-tapply(jerk_mean2$MeanJerk, INDEX = jerk_mean2$Trial2, sd, na.rm = T)
-
-```
-
-
 ---
 
 
@@ -1205,12 +946,12 @@ tapply(jerk_mean2$MeanJerk, INDEX = jerk_mean2$Trial2, sd, na.rm = T)
 
 ```{r}
 
-ggplot(jerk_mean2, aes(x = Trial2, y = MeanJerk, group = Participant)) +
+ggplot(jerk_mean2, aes(x = Time, y = MeanJerk, group = Participant)) +
   geom_line() +
-  labs(x = "Time", y = "Jerk (m/s^3)") +
-  ggtitle("Mean jerk by group for each participant over time") +
+  labs(x = "Time", y = "Mean jerk (m/s^3)") +
+  ggtitle("Mean jerk by group for each participant over time - spaghetti plot") +
   theme_classic() +
-  facet_wrap(~ Condition2)
+  facet_wrap(~ Condition)
 
 ```
 
@@ -1223,11 +964,11 @@ ggplot(jerk_mean2, aes(x = Trial2, y = MeanJerk, group = Participant)) +
 
 ```{r}
 
-mj.lmer1 <- lmer(MeanJerk ~ Condition2 * Trial2 + (1 | Participant),
+mj.mer1 <- lmer(MeanJerk ~ Condition * Time + (1 | Participant),
                  data = jerk_mean2)
 
 
-mj.lmer2 <- lmer(logMeanJerk ~ Condition2 * Trial2 + (1 | Participant),
+mj.mer2 <- lmer(logMeanJerk ~ Condition * Time + (1 | Participant),
                  data = jerk_mean2)
 
 ```
@@ -1237,7 +978,21 @@ mj.lmer2 <- lmer(logMeanJerk ~ Condition2 * Trial2 + (1 | Participant),
 
 ```{r}
 
-plot(mj.lmer1, main = "Mean jerk - resids vs fits: raw data")
+#plot(mj.mer1, main = "Mean jerk - resids vs fits: raw data")
+
+res_fit_mj_mer1_df <- data.frame(res = residuals(mj.mer1, type = "pearson"),
+                                 fit = fitted(mj.mer1))
+
+p_res_fit_mj_mer1 <- 
+  ggplot(res_fit_mj_mer1_df, aes(x = fit, y = res)) +
+  geom_point() +
+  geom_hline(yintercept = 0, linetype = 2, colour = "red") +
+  labs(x = "Fitted values", y = "Standardised residuals") +
+  ggtitle("Mean jerk model - raw data") +
+  theme_classic()
+
+print(p_res_fit_mj_mer1)
+
 
 ```
 
@@ -1248,158 +1003,711 @@ plot(mj.lmer1, main = "Mean jerk - resids vs fits: raw data")
 
 ```{r}
 
-plot(mj.lmer2, main = "Mean jerk - resids vs fits: log-transformed data")
+#plot(mj.mer2, main = "Mean jerk - resids vs fits: log-transformed data")
+
+res_fit_mj_mer2_df <- data.frame(res = residuals(mj.mer2, type = "pearson"),
+                                 fit = fitted(mj.mer2))
+
+p_res_fit_mj_mer2 <- 
+  ggplot(res_fit_mj_mer2_df, aes(x = fit, y = res)) +
+  geom_point() +
+  geom_hline(yintercept = 0, linetype = 2, colour = "red") +
+  labs(x = "Fitted values", y = "Standardised residuals") +
+  ggtitle("Mean jerk model - log-transformed data") +
+  theme_classic()
+
+print(p_res_fit_mj_mer2)
+
+
+```
+
+]
+
+Some improvement in stabilising variance from log transformation
+
+```{r eval = F}
+
+p_res_fit_mj_mer2a <- 
+  ggplot(res_fit_mj_mer2_df, aes(x = fit, y = sqrt(abs(res)))) +
+  geom_point() +
+  labs(x = "Fitted values", y = "sqrt(abs(Standardised residuals))") +
+  ggtitle("Mean jerk model - log-transformed data - scale-location") +
+  theme_classic()
+
+print(p_res_fit_mj_mer2a)
 
 ```
 
 
+
+---
+
+
+# Mixed model: repeated measurements
+
+
+.pull-left[
+
+
+Some deviation from normal distribution evident
+
+
+]
+
+
+.pull-right[
+```{r}
+
+ggplot(res_fit_mj_mer2_df, aes(sample = res)) +
+  geom_qq() +
+  geom_qq_line() +
+  labs(x = "Normal quantile", y = "Sample quantile") +
+  ggtitle("Mean jerk model - log-transformed data") +
+  theme_classic()
+
+
+```
+
+]
+
+
 ```{r eval = F}
 
-mj.res.dev <- residuals(mj.lmer2, type = "deviance")
+normalityTest(res_fit_mj_mer2_df$res, test = "ad.test")
 
-mj.fit <- fitted(mj.lmer2)
+```
 
-mj.res.fit <- data.frame(res = mj.res.dev, res2 = sqrt(abs(mj.res.dev)), 
-                         fit = mj.fit)
+---
 
-ggplot(mj.res.fit, aes(x = fit, y = res2)) +
+# Mixed model: repeated measurements
+
+
+```{r}
+
+mj.aov2 <- as.data.frame(anova(mj.mer2, type = "II"))
+
+mj.aov2 %>%
+  mutate(across(where(is.numeric), round, 3)) %>%
+  kbl() %>%
+  kable_styling(full_width = F, font_size = 18)
+
+```
+
+Condition-Time interaction is not an active predictor (p = 0.73)
+
+
+```{r}
+
+#mj.mer3 <- lmer(MeanJerk ~ Condition + Time + (1 | Participant),
+#                 data = jerk_mean2)
+
+mj.mer4 <- lmer(logMeanJerk ~ Condition + Time + (1 | Participant),
+                 data = jerk_mean2)
+
+```
+
+
+
+```{r}
+
+mj.aov4 <- as.data.frame(anova(mj.mer4, type = "II"))
+
+mj.aov4 %>%
+  mutate(across(where(is.numeric), round, 3)) %>%
+  kbl() %>%
+  kable_styling(full_width = F, font_size = 18)
+
+```
+
+Training regime is not associated with mean jerk (p = 0.30)
+
+
+---
+
+# Mixed model: repeated measurements
+
+
+.pull-left[
+
+```{r}
+
+mj.emm2 <- emmeans(mj.mer2, ~ Condition | Time, 
+                   options = list(tran = "log"), type = "response")
+
+mj.emm2.df <- as.data.frame(mj.emm2)
+
+ggplot(mj.emm2.df, aes(x = Time, y = response, colour = Condition)) +
+  geom_errorbar(aes(ymin = lower.CL, ymax = upper.CL), width = 0.2,
+                    position = position_dodge(0.5)) +
+  geom_line(aes(x = as.numeric(Time), y = response), 
+            position = position_dodge(0.5)) +
+  geom_point(position = position_dodge(0.5)) +
+  labs(y = "Mean jerk (m/s^3)") +
+  ggtitle("Estimated (geometric) mean jerk with 95 % confidence interval") +
+  theme_classic()
+         
+
+```
+
+]
+
+.pull-right[
+
+```{r}
+
+mj.emm4 <- emmeans(mj.mer4, ~ Condition, 
+                   options = list(tran = "log"), type = "response")
+
+
+mj.emm4.df <- as.data.frame(mj.emm4)
+
+ggplot(mj.emm4.df, aes(x = Condition, y = response, colour = Condition)) +
+  geom_errorbar(aes(ymin = lower.CL, ymax = upper.CL), width = 0.1) +
+  geom_line() +
   geom_point() +
+  labs(y = "Mean jerk (m/s^3)") + 
+  ggtitle("Estimated (geometric) mean jerk with 95 % confidence interval") +
+  theme_classic() +
+  theme(legend.position = "None")
+
+
+```
+
+]
+
+Training had no apparent impact as task was simple (Harris et al.).
+
+
+
+---
+
+# Linear model: linear regression
+
+**Proficiency in instrument control: Is smooth instrument movement related to error rate in a ring-carrying exercise?**
+
+*Outcome:* No. errors per sec. (baseline) - continuous
+
+*Predictor:* Mean jerk (change in acceleration) - continuous
+
+*Data structure:* Independent
+
+*Model:* Linear regression - normal distribution assumption
+
+$$\mathrm{ErrorRate} = \beta_0 + \beta_1 \; \mathrm{MeanJerk}$$
+
+
+---
+
+# Linear model: linear regression
+
+
+Data
+
+```{r}
+
+surg %>%
+  select(Participant, ERRORS.SEC_RT1, RT1Errors, RT1Time, MeanJerk1) %>%
+  head() %>%
+  mutate(across(where(is.numeric), round, 3)) %>%
+  kbl() %>%
+  kable_styling(full_width = F, font_size = 18)
+
+```
+
+
+---
+
+# Linear model: linear regression
+
+
+.pull-left[
+
+```{r}
+
+p_surg_err <- 
+  ggplot(surg, aes(x = "", y = ERRORS.SEC_RT1)) +
+  geom_boxplot(outlier.shape = NA, width = 0.4) +  # avoid plotting outliers twice
+  geom_jitter(position = position_jitter(width = 0.1, height = 0.1)) +
+  labs(x = "", y = "Error per sec.") +
+  theme_classic()
+
+print(p_surg_err)
+
+
+```
+
+
+Some positive skewness
+
+]
+
+.pull-right[
+
+```{r}
+
+p_surg_jerk <- 
+  ggplot(surg, aes(x = "", y = MeanJerk1)) +
+  geom_boxplot(outlier.shape = NA, width = 0.4) +  # avoid plotting outliers twice
+  geom_jitter(position = position_jitter(width = 0.1, height = 0.1)) +
+  labs(x = "", y = "Mean jerk (m/s^3)") +
+  theme_classic()
+
+print(p_surg_jerk)
+
+```
+
+]
+
+
+---
+
+# Linear model: linear regression
+
+.pull-left[
+
+```{r}
+
+# Chunk option: out.width = "50%"
+
+
+p_surg_err_jerk <- 
+  ggplot(surg, aes(x = MeanJerk1, y = ERRORS.SEC_RT1)) +
+  geom_point() +
+  labs(x = "Mean jerk (m/s^3)", y = "Errors per sec.") +
+  theme_classic()
+
+print(p_surg_err_jerk)
+
+```
+
+]
+
+.pull-right[
+
+- Linear relationship
+- *Variability* of error rate increases with mean jerk
+
+]
+
+
+---
+
+# Linear model: linear regression
+
+
+```{r}
+
+err.lm1 <- lm(ERRORS.SEC_RT1 ~ MeanJerk1, data = surg)
+
+#anova(err.lm1)
+
+sumary(err.lm1)
+
+```
+
+Can we accept this model as valid?
+
+Check the assumptions!
+
+*Assumptions*
+
+- Residuals have constant variance
+- Residuals are normally distributed
+
+
+---
+
+# Linear model: linear regression
+
+.pull-left[
+
+Assumption 1: Residuals have constant variance
+
+- Fanning pattern suggests variance not constant
+
+]
+
+
+.pull-right[
+
+```{r}
+
+res_fit_err1_df <- data.frame(sres = rstandard(err.lm1),
+                              fit = fitted(err.lm1))
+
+p_res_fit_err1 <- 
+  ggplot(res_fit_err1_df, aes(x = fit, y = sres)) +
+  geom_point() +
+  geom_hline(yintercept = 0, linetype = 2, colour = "red") +
+  labs(x = "Fitted values", y = "Standardised residuals") +
+  ggtitle("Raw outcome") +
+  theme_classic()
+
+print(p_res_fit_err1)
+
+```
+
+]
+
+---
+
+# Linear model: linear regression
+
+
+.pull-left[
+
+Assumption 2: Residuals normally distributed
+
+- No gross deviation apparent
+
+]
+
+
+.pull-right[
+
+```{r}
+
+p_qq_err1 <- 
+  ggplot(res_fit_err1_df, aes(sample = sres)) +
+  geom_qq() +
+  geom_qq_line() +
+  labs(x = "Normal quantile", y = "Sample quantile") +
+  theme_classic()
+
+print(p_qq_err1)
+
+```
+
+]
+
+
+```{r eval = F}
+
+plot(err.lm1, which = 3)
+
+```
+
+---
+
+# Linear model: linear regression
+
+
+.pull-left[
+
+Address non-constant variance
+
+- Log-transforming positively skewed outcome may be useful
+- Log transformation maybe a little too strong
+
+]
+
+
+.pull-right[
+
+```{r}
+
+surg$logERRORS.SEC_RT1 <- log(surg$ERRORS.SEC_RT1 )
+
+ggplot(surg, aes(x = "", y = logERRORS.SEC_RT1)) +
+  geom_boxplot(outlier.shape = NA, width = 0.4) +  # avoid plotting outliers twice
+  geom_jitter(position = position_jitter(width = 0.1, height = 0.1)) +
+  labs(x = "", y = "log(Errors per sec.)") +
   theme_classic()
 
 ```
 
 ]
 
+
+---
+
+# Linear model: linear regression
+
+.pull-left[
+
+Log transformation has stabilised variance to some degree
+
+]
+
+.pull-right[
+
+```{r}
+
+
+err.lm2 <- lm(logERRORS.SEC_RT1 ~ MeanJerk1, data = surg)
+
+res_fit_err2_df <- data.frame(sres = rstandard(err.lm2),
+                              fit = fitted(err.lm2))
+
+
+p_res_fit_err2 <- 
+  ggplot(res_fit_err2_df, aes(x = fit, y = sres)) +
+  geom_point() +
+  geom_hline(yintercept = 0, linetype = 2, colour = "red") +
+  labs(x = "Fitted values", y = "Standardised residuals") +
+  ggtitle("Log-transformed outcome") +
+  theme_classic()
+
+print(p_res_fit_err2)
+
+```
+
+]
+
+---
+
+# Linear model: linear regression
+
+Model with log-transformed response variable
+
+```{r}
+
+sumary(err.lm2)
+
+```
+
+---
+
+# Generalised linear model - Poisson
+
+But "errors per sec." is really a rate ...
+
+- different types of regression model for different types of outcome variable
+- count over given time intervals  - Poisson distribution (integer values, 0 is a possible value, no upper limit)
+- *generalised* linear model (non-normal outcome variable)
+
+
+
+---
+
+# Generalised linear model - Poisson
+
+
+```{r}
+
+err.glm1 <- glm(RT1Errors ~ MeanJerk1 + offset(log(RT1Time)),
+                family = poisson, data = surg)
+
+sumary(err.glm1)
+
+```
+
+*Model equation*
+
+$$\log{Y} = \beta_0 + \beta_1 X$$
+$$\log{\mathrm{(No. of \; errors)}} = \beta_0 + \beta_1 \mathrm{MeanJerk} + \log{\mathrm{(Time \; period)}} $$
+
+Must add "time period" adjustment, as each participant's time to complete was different
+
+
+---
+
+# Generalised linear model - Poisson
+
+Check the assumptions!
+
+*Assumptions*
+
+- Quantile residuals have constant variance (constant dispersion)
+- Quantile residuals are normally distributed
+- Overdispersion not present
+
+
+---
+
+# Generalised linear model - Poisson
+
+.pull.left[
+
+```{r}
+
+res_fit_err_glm1_df <- data.frame(res = qresiduals(err.glm1),
+                                  fit = fitted(err.glm1))
+
+p_res_fit_err_glm1 <- 
+  ggplot(res_fit_err_glm1_df, aes(x = fit, y = res)) +
+  geom_point() +
+  geom_hline(yintercept = 0, linetype = 2, colour = "red") +
+  labs(x = "Fitted values", y = "Standardised residuals") +
+  ggtitle("Poisson model") +
+  theme_classic()
+
+print(p_res_fit_err_glm1)
+
+```
+
+]
+
+.pull-right[
+
+
+```{r}
+
+p_qq_err_glm1 <- 
+  ggplot(res_fit_err_glm1_df, aes(sample = res)) +
+  geom_qq() +
+  geom_qq_line() +
+  labs(x = "Normal quantile", y = "Sample quantile") +
+  ggtitle("Poisson model") +
+  theme_classic()
+
+print(p_qq_err_glm1)
+
+```
+
+]
+
+Constant variance and normal distribution assumptions are quite well satisfied
+
+---
+
+# Errors per sec. - which model?
+
+
 ```{r eval = F}
 
-anova(mj.lmer1, type = "II")
+err.lm2.pred <- predict(err.lm2, newdata = list(MeanJerk1 = surg$MeanJerk1))
+
+err.glm1.pred <- predict(
+  err.glm1, newdata = data.frame(MeanJerk1 = surg$MeanJerk1, 
+                                RT1Time = rep(1, dim(surg)[1])),
+  type = "response")
+
+err.plot <- data.frame(
+  Observed = surg$ERRORS.SEC_RT1, MeanJerk = surg$MeanJerk1,
+  Gaussian = exp(err.lm2.pred), Poisson = err.glm1.pred)
+
+err.plot.st<-
+  err.plot %>%
+  pivot_longer(!MeanJerk, names_to = "Response", values_to = "Errors.per.sec")
+
+err.plot.st$Response <- factor(err.plot.st$Response,
+                               levels = c("Observed", "Gaussian", "Poisson"))
+
+ggplot(err.plot.st, aes(x = MeanJerk, y = Errors.per.sec, 
+                        colour = Response)) +
+  geom_point(data = err.plot.st[err.plot.st$Response == "Observed", ]) +
+  geom_line(data = err.plot.st[err.plot.st$Response == "Gaussian", ]) +
+  geom_line(data = err.plot.st[err.plot.st$Response == "Poisson", ]) +
+  labs(Y = "Errors per sec.") +
+  ggtitle("Errors per sec. - observed data with fitted values from Gaussian and Poisson models") + 
+  theme_classic()
+
+
+```
+
+
+.pull-left[
+
+```{r}
+
+err.lm2.L <- lm(log(ERRORS.SEC_RT1) ~ MeanJerk1, data = surg)
+
+X_mj <- seq(0.03, 0.1, by = 0.002)
+
+p_lm_out <- plot(ggpredict(err.lm2.L, terms = "MeanJerk1 [X_mj]")) +
+  ylim(0, 0.65) +
+  labs(x = "Mean jerk (m/s^3)", y = "Errors per sec.") +
+  ggtitle("Errors per sec. - fitted Gaussian model with 95 % prediction interval") + 
+  theme_classic()
+
+## Above plot call gives:
+## Model has log-transformed response. Back-transforming predictions to original response scale. Standard errors are still on the log-scale.
+
+print(p_lm_out)
+
+```
+
+]
+
+.pull-right[
+
+```{r}
+
+p_pois_out <- plot(ggpredict(err.glm1, 
+                             terms = c("MeanJerk1 [X_mj]", "RT1Time [1]"))) +
+  ylim(0, 0.65) +
+  labs(x = "Mean jerk (m/s^3)", y = "Errors per sec.") +
+  ggtitle("Errors per sec. - fitted Poisson model with 95 % prediction interval") + 
+  theme_classic()
+
+print(p_pois_out)
+
+```
+
+]
+
+
+
+
+
+```{r eval = F}
+
+# Generalised linear model - Neg. binomial
+
+err.glm2 <- glm.nb(RT1Errors ~ MeanJerk1 + offset(log(RT1Time)),
+                   data = surg)
+
+#summary(err.glm2)
+
+```
+
+
+
+```{r eval = F}
+
+X_mj <- seq(0.03, 0.1, by = 0.002)
+
+p_nb <- plot(ggpredict(err.glm2, terms = c("MeanJerk1 [X_mj]", "RT1Time [1]")))
 
 ```
 
 
 ```{r eval = F}
 
-mj.lmer3 <- lmer(MeanJerk ~ Condition2 + Trial2 + (1 | Participant),
-                 data = jerk_mean2)
+res_fit_err_glm2_df <- data.frame(res = qresiduals(err.glm2),
+                                  fit = fitted(err.glm2))
 
+p_res_fit_err_glm2 <- 
+  ggplot(res_fit_err_glm2_df, aes(x = fit, y = res)) +
+  geom_point() +
+  geom_hline(yintercept = 0, linetype = 2, colour = "red") +
+  labs(x = "Fitted values", y = "Standardised residuals") +
+  ggtitle("Negative binomial model") +
+  theme_classic()
 
-mj.lmer4 <- lmer(logMeanJerk ~ Condition2 + Trial2 + (1 | Participant),
-                 data = jerk_mean2)
+print(p_res_fit_err_glm2)
 
 ```
+
 
 
 
 ```{r eval = F}
 
-anova(mj.lmer3)
+p_qq_err_glm2 <- 
+  ggplot(res_fit_err_glm2_df, aes(sample = res)) +
+  geom_qq() +
+  geom_qq_line() +
+  labs(x = "Normal quantile", y = "Sample quantile") +
+  ggtitle("Negative binomial model") +
+  theme_classic()
+
+print(p_qq_err_glm2)
 
 ```
 
 
----
-
-# Outline
-
-Continuous outcome - normal distribn
-
-Mean jerk - *plot data*
-
-Compare baseline to post-observation to retention
-
-Data not independent
-
-Mean jerk - *plot data*
-
-- categorical predictor - three times - mixed model
-    - assumptions
 
 
----
+```{r eval = F}
 
-# Outline
+BIC(err.glm1)
 
-Continuous outcome - normal distribn
+BIC(err.glm2)
 
-Mean jerk - *plot data*
+```
 
-Compare baseline to post-observation
-
-Data not independent
-
-Mean jerk - *plot data*
-
-- categorical predictor - two times - paired t test
-    - assumptions
-
----
-
-# Outline
-
-Categorical outcome
-
-Independent data
-
-Knot-tying skill (sat or unsat) - - *plot data*
-
-Is there an association with condition?
-
-Pearson's $\chi^2$ test
-- assumptions
-
----
-
-# Outline
-
-Kinoshita
-
-POD
-
-Binary outcome
-
-Is there an association between NLR </>= 3 ad POD?
-
-Pearson's $\chi^2$ test
-- assumptions
-
-Can't estimate parameter or use controlling variables
-
-
----
-
-# Outline
-
-Kinoshita
-
-POD
-
-Binary outcome
-
-- categorical predictor - NLR
-- controlling variable - ACCI
-
-
----
-
-# Outline
-
-
-ICDSC score - 1, 2, ... , 6
-
-"Quantitative" outcome - or is it?
-
-Predictor - NLR - continuous or categorical (by interval)?
-
-Normal assumption untenable
-
-- non-parametric method - Kruskal-Wallis
-    - compare NLR levels against lowest (Dunn's test)
-    
-- ordered categorical variable - ordinal logistic regression
-    - NLR categories
-    - NLR continuous
-    
-    
   
 ---
 
