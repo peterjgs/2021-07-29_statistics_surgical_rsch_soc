@@ -6,7 +6,7 @@ output:
   xaringan::moon_reader:
     css: [default, metropolis, metropolis-fonts]
     lib_dir: libs
-    self_contained: false
+    self_contained: true
     nature:
       highlightStyle: github
       countIncrementalSlides: false
@@ -801,14 +801,9 @@ Mean jerk = overall mean + time effect + condition effect + time:condition effec
 - subject: accounts for grouping of data values by subject (i.e. non-independence)
 
 
-
----
-
-# Mixed model: repeated measurements
-
 ```{r}
 
-## Make required stacxked data set
+## Make required stacked data set
 
 jerk_mean1 <- 
     surg %>%
@@ -852,9 +847,7 @@ rm(jerk_mean1)
 
 
 
-.pull-left[
-
-```{r}
+```{r eval = F}
 
 ggplot(jerk_mean2, aes(x = Time, y = MeanJerk, colour = Time)) + 
   geom_boxplot(outlier.shape = NA, width = 0.4) +  # avoid plotting outliers twice 
@@ -865,12 +858,9 @@ ggplot(jerk_mean2, aes(x = Time, y = MeanJerk, colour = Time)) +
 
 ```
 
-]
-
-.pull-right[
 
 
-```{r}
+```{r eval = F}
 
 ggplot(jerk_mean2, aes(x = Condition, y = MeanJerk, colour = Condition)) + 
   geom_boxplot(outlier.shape = NA, width = 0.4) +  # avoid plotting outliers twice 
@@ -882,7 +872,7 @@ ggplot(jerk_mean2, aes(x = Condition, y = MeanJerk, colour = Condition)) +
 
 ```
 
-]
+
 
 ---
 
@@ -947,7 +937,7 @@ ggplot(jerk_mean2, aes(x = Condition, y = logMeanJerk, colour = Time)) +
 ```{r}
 
 ggplot(jerk_mean2, aes(x = Time, y = MeanJerk, group = Participant)) +
-  geom_line() +
+  geom_line(colour = "#66cc66") +
   labs(x = "Time", y = "Mean jerk (m/s^3)") +
   ggtitle("Mean jerk by group for each participant over time - spaghetti plot") +
   theme_classic() +
@@ -970,6 +960,20 @@ mj.mer1 <- lmer(MeanJerk ~ Condition * Time + (1 | Participant),
 
 mj.mer2 <- lmer(logMeanJerk ~ Condition * Time + (1 | Participant),
                  data = jerk_mean2)
+
+```
+
+
+
+```{r}
+
+mj.lme1 <- lme(MeanJerk ~ Condition * Time, random = ~ 1 | Participant,
+                 data = jerk_mean2)
+
+
+mj.lme2 <- lme(logMeanJerk ~ Condition * Time, random = ~ 1 | Participant,
+                 data = jerk_mean2)
+
 
 ```
 
@@ -1082,7 +1086,9 @@ normalityTest(res_fit_mj_mer2_df$res, test = "ad.test")
 # Mixed model: repeated measurements
 
 
-```{r}
+```{r eval = F}
+
+## This is displayed in terms of sums of squares - a bit confusing!
 
 mj.aov2 <- as.data.frame(anova(mj.mer2, type = "II"))
 
@@ -1092,6 +1098,20 @@ mj.aov2 %>%
   kable_styling(full_width = F, font_size = 18)
 
 ```
+
+
+
+```{r}
+
+mj.aov2a <- as.data.frame(anova(mj.lme2))
+
+mj.aov2a[!(row.names(mj.aov2a) %in% "(Intercept)"), ] %>%
+  mutate(across(where(is.numeric), round, 3)) %>%
+  kbl() %>%
+  kable_styling(full_width = F, font_size = 18)
+
+```
+
 
 Condition-Time interaction is not an active predictor (p = 0.73)
 
@@ -1110,6 +1130,15 @@ mj.mer4 <- lmer(logMeanJerk ~ Condition + Time + (1 | Participant),
 
 ```{r}
 
+mj.lme4 <- lme(logMeanJerk ~ Condition + Time, random = ~ 1 | Participant,
+               data = jerk_mean2)
+
+```
+
+
+
+```{r eval = F}
+
 mj.aov4 <- as.data.frame(anova(mj.mer4, type = "II"))
 
 mj.aov4 %>%
@@ -1118,6 +1147,20 @@ mj.aov4 %>%
   kable_styling(full_width = F, font_size = 18)
 
 ```
+
+
+
+```{r}
+
+mj.aov4a <- as.data.frame(anova(mj.lme4))
+
+mj.aov4a[!(row.names(mj.aov4a) %in% "(Intercept)"), ] %>%
+  mutate(across(where(is.numeric), round, 3)) %>%
+  kbl() %>%
+  kable_styling(full_width = F, font_size = 18)
+
+```
+
 
 Training regime is not associated with mean jerk (p = 0.30)
 
@@ -1517,22 +1560,19 @@ Check the assumptions!
 
 # Generalised linear model - Poisson
 
-.pull.left[
+.pull-left[
 
 ```{r}
 
 res_fit_err_glm1_df <- data.frame(res = qresiduals(err.glm1),
                                   fit = fitted(err.glm1))
 
-p_res_fit_err_glm1 <- 
-  ggplot(res_fit_err_glm1_df, aes(x = fit, y = res)) +
+ggplot(res_fit_err_glm1_df, aes(x = fit, y = res)) +
   geom_point() +
   geom_hline(yintercept = 0, linetype = 2, colour = "red") +
   labs(x = "Fitted values", y = "Standardised residuals") +
   ggtitle("Poisson model") +
   theme_classic()
-
-print(p_res_fit_err_glm1)
 
 ```
 
@@ -1543,21 +1583,18 @@ print(p_res_fit_err_glm1)
 
 ```{r}
 
-p_qq_err_glm1 <- 
-  ggplot(res_fit_err_glm1_df, aes(sample = res)) +
+ggplot(res_fit_err_glm1_df, aes(sample = res)) +
   geom_qq() +
   geom_qq_line() +
   labs(x = "Normal quantile", y = "Sample quantile") +
   ggtitle("Poisson model") +
   theme_classic()
 
-print(p_qq_err_glm1)
-
 ```
 
 ]
 
-Constant variance and normal distribution assumptions are quite well satisfied
+Constant var. and normal dist. assumptions are quite well satisfied 
 
 ---
 
@@ -1608,7 +1645,8 @@ X_mj <- seq(0.03, 0.1, by = 0.002)
 p_lm_out <- plot(ggpredict(err.lm2.L, terms = "MeanJerk1 [X_mj]")) +
   ylim(0, 0.65) +
   labs(x = "Mean jerk (m/s^3)", y = "Errors per sec.") +
-  ggtitle("Errors per sec. - fitted Gaussian model with 95 % prediction interval") + 
+  ggtitle("Errors per sec. - fitted Gaussian model 
+          using log-transformed response with 95 % prediction interval") + 
   theme_classic()
 
 ## Above plot call gives:
@@ -1637,7 +1675,7 @@ print(p_pois_out)
 
 ]
 
-
+Poisson: maybe better inferences - overdispersion not yet checked!
 
 
 
@@ -1661,6 +1699,7 @@ X_mj <- seq(0.03, 0.1, by = 0.002)
 p_nb <- plot(ggpredict(err.glm2, terms = c("MeanJerk1 [X_mj]", "RT1Time [1]")))
 
 ```
+
 
 
 ```{r eval = F}
