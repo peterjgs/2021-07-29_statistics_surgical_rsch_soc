@@ -1,7 +1,7 @@
 ---
 title: "The challenge of everyday statistics in 30 minutes"
 author: "Peter Geelan-Small - Stats Central, UNSW"
-date: "29th July, 2021"
+date: "Surgical Research Society - 29th July, 2021"
 output:
   xaringan::moon_reader:
     css: [default, metropolis, metropolis-fonts]
@@ -226,7 +226,8 @@ ktime2$Condition2 <- factor(ktime2$Condition2)
 
 ggplot(ktime2, aes(x = "", y = KTTime)) +
   geom_boxplot(outlier.shape = NA, width = 0.4) +  # avoid plotting outliers twice
-  geom_jitter(position = position_jitter(width = 0.1, height = 0)) +
+  geom_jitter(position = position_jitter(width = 0.1, height = 0),
+              colour = "#9900ff", shape = 1, size = 2) +
   labs(x = "", y = "Time (s)") +
   ggtitle("Knot-tying time - raw data") +
   theme_classic()
@@ -243,7 +244,8 @@ ggplot(ktime2, aes(x = "", y = KTTime)) +
 
 ggplot(ktime2, aes(x = Condition2, y = KTTime)) +
   geom_boxplot(outlier.shape = NA, width = 0.4) +  # avoid plotting outliers twice
-  geom_jitter(position = position_jitter(width = 0.1, height = 0)) +
+  geom_jitter(position = position_jitter(width = 0.1, height = 0),
+              colour = "#9900ff", shape = 1, size = 2) +
   labs(x = "Condition", y = "Time (s)") +
   ggtitle("Knot-tying time by group - raw data") +
   theme_classic()
@@ -267,8 +269,8 @@ Positive skew is evident
 ktime2 %>%
   filter(Condition2 == "Control") %>% 
   ggplot(., aes(sample = KTTime)) +
-  geom_qq() +
-  geom_qq_line() +
+  geom_qq(colour = "#9900ff", shape = 1, size = 2) +
+  geom_qq_line(colour = "#aaaaaa") +
   labs(x = "Normal quantile", y = "Sample quantile") +
   ggtitle("Normal Q-Q plot - raw data: Control") +
   theme_classic()
@@ -285,8 +287,8 @@ ktime2 %>%
 ktime2 %>%
   filter(Condition2 == "Expert") %>% 
   ggplot(., aes(sample = KTTime)) +
-  geom_qq() +
-  geom_qq_line() +
+  geom_qq(colour = "#9900ff", shape = 1, size = 2) +
+  geom_qq_line(colour = "#aaaaaa") +
   labs(x = "Normal quantile", y = "Sample quantile") +
   ggtitle("Normal Q-Q plot - raw data: Expert") +
   theme_classic()
@@ -318,7 +320,8 @@ Data deviates visibly from normal distribution
 
 ggplot(ktime2, aes(x = "", y = logKTTime)) +
   geom_boxplot(outlier.shape = NA, width = 0.4) +  # avoid plotting outliers twice
-  geom_jitter(position = position_jitter(width = 0.1, height = 0)) +
+  geom_jitter(position = position_jitter(width = 0.1, height = 0),
+              colour = "#ff6600", shape = 1, size = 2) +
   labs(x = "", y = "log(Time (s))") +
   ggtitle("Knot-tying time - log-transformed data") +
   theme_classic()
@@ -344,7 +347,8 @@ ggplot(ktime2, aes(x = "", y = logKTTime)) +
 
 ggplot(ktime2, aes(x = Condition2, y = logKTTime)) +
   geom_boxplot(outlier.shape = NA, width = 0.4) +  # avoid plotting outliers twice
-  geom_jitter(position = position_jitter(width = 0.1, height = 0)) +
+  geom_jitter(position = position_jitter(width = 0.1, height = 0),
+              colour = "#ff6600", shape = 1, size = 2) +
   labs(x = "Condition", y = "log(Time (s))") +
   ggtitle("Knot-tying time by group - log-transformed data") +
   theme_classic()
@@ -366,8 +370,8 @@ ggplot(ktime2, aes(x = Condition2, y = logKTTime)) +
 ktime2 %>%
   filter(Condition2 == "Control") %>% 
   ggplot(., aes(sample = logKTTime)) +
-  geom_qq() +
-  geom_qq_line() +
+  geom_qq(colour = "#ff6600", shape = 1, size = 2) +
+  geom_qq_line(colour = "#aaaaaa") +
   labs(x = "Normal quantile", y = "Sample quantile") +
   ggtitle("Normal Q-Q plot - log-transformed data: Control") +
   theme_classic()
@@ -384,8 +388,8 @@ ktime2 %>%
 ktime2 %>%
   filter(Condition2 == "Expert") %>% 
   ggplot(., aes(sample = logKTTime)) +
-  geom_qq() +
-  geom_qq_line() +
+  geom_qq(colour = "#ff6600", shape = 1, size = 2) +
+  geom_qq_line(colour = "#aaaaaa") +
   labs(x = "Normal quantile", y = "Sample quantile") +
   ggtitle("Normal Q-Q plot - log-transformed data: Expert") +
   theme_classic()
@@ -567,7 +571,7 @@ Multiple two-sample $t$ tests? - No!
 
 ---
 
-# More than two independent groups
+# ANOVA: More than 2 independent groups
 
 
 Model equation for ANOVA model
@@ -789,7 +793,7 @@ kt.est.coef %>%
 
 ---
 
-# Mixed model: repeated measurements
+# Mixed model: non-independent data
 
 *Model equation*
 
@@ -876,7 +880,7 @@ ggplot(jerk_mean2, aes(x = Condition, y = MeanJerk, colour = Condition)) +
 
 ---
 
-# Mixed model: repeated measurements
+# Mixed model: non-independent data
 
 .pull-left[
 
@@ -931,7 +935,7 @@ ggplot(jerk_mean2, aes(x = Condition, y = logMeanJerk, colour = Time)) +
 ---
 
 
-# Mixed model: repeated measurements
+# Mixed model: non-independent data
 
 
 ```{r}
@@ -949,7 +953,7 @@ ggplot(jerk_mean2, aes(x = Time, y = MeanJerk, group = Participant)) +
 
 ---
 
-# Mixed model: repeated measurements
+# Mixed model: non-independent data
 
 
 ```{r}
@@ -989,7 +993,7 @@ res_fit_mj_mer1_df <- data.frame(res = residuals(mj.mer1, type = "pearson"),
 
 p_res_fit_mj_mer1 <- 
   ggplot(res_fit_mj_mer1_df, aes(x = fit, y = res)) +
-  geom_point() +
+  geom_point(colour = "#3399ff", shape = 1, size = 2) +
   geom_hline(yintercept = 0, linetype = 2, colour = "red") +
   labs(x = "Fitted values", y = "Standardised residuals") +
   ggtitle("Mean jerk model - raw data") +
@@ -1014,7 +1018,7 @@ res_fit_mj_mer2_df <- data.frame(res = residuals(mj.mer2, type = "pearson"),
 
 p_res_fit_mj_mer2 <- 
   ggplot(res_fit_mj_mer2_df, aes(x = fit, y = res)) +
-  geom_point() +
+  geom_point(colour = "#660000", shape = 1, size = 2) +
   geom_hline(yintercept = 0, linetype = 2, colour = "red") +
   labs(x = "Fitted values", y = "Standardised residuals") +
   ggtitle("Mean jerk model - log-transformed data") +
@@ -1047,7 +1051,7 @@ print(p_res_fit_mj_mer2a)
 ---
 
 
-# Mixed model: repeated measurements
+# Mixed model: non-independent data
 
 
 .pull-left[
@@ -1063,8 +1067,8 @@ Some deviation from normal distribution evident
 ```{r}
 
 ggplot(res_fit_mj_mer2_df, aes(sample = res)) +
-  geom_qq() +
-  geom_qq_line() +
+  geom_qq(colour = "#660000", shape = 1, size = 2) +
+  geom_qq_line(colour = "#aaaaaa") +
   labs(x = "Normal quantile", y = "Sample quantile") +
   ggtitle("Mean jerk model - log-transformed data") +
   theme_classic()
@@ -1083,7 +1087,7 @@ normalityTest(res_fit_mj_mer2_df$res, test = "ad.test")
 
 ---
 
-# Mixed model: repeated measurements
+# Mixed model: non-independent data
 
 
 ```{r eval = F}
@@ -1167,7 +1171,7 @@ Training regime is not associated with mean jerk (p = 0.30)
 
 ---
 
-# Mixed model: repeated measurements
+# Mixed model: non-independent data
 
 
 .pull-left[
@@ -1244,7 +1248,7 @@ $$\mathrm{ErrorRate} = \beta_0 + \beta_1 \; \mathrm{MeanJerk}$$
 # Linear model: linear regression
 
 
-Data
+Data (excerpt)
 
 ```{r}
 
@@ -1270,7 +1274,8 @@ surg %>%
 p_surg_err <- 
   ggplot(surg, aes(x = "", y = ERRORS.SEC_RT1)) +
   geom_boxplot(outlier.shape = NA, width = 0.4) +  # avoid plotting outliers twice
-  geom_jitter(position = position_jitter(width = 0.1, height = 0.1)) +
+  geom_jitter(position = position_jitter(width = 0.1, height = 0.1),
+              colour = "#ff9900", shape = 1, size = 2) +
   labs(x = "", y = "Error per sec.") +
   theme_classic()
 
@@ -1291,7 +1296,8 @@ Some positive skewness
 p_surg_jerk <- 
   ggplot(surg, aes(x = "", y = MeanJerk1)) +
   geom_boxplot(outlier.shape = NA, width = 0.4) +  # avoid plotting outliers twice
-  geom_jitter(position = position_jitter(width = 0.1, height = 0.1)) +
+  geom_jitter(position = position_jitter(width = 0.1, height = 0.1),
+              colour = "#ff9900", shape = 1, size = 2) +
   labs(x = "", y = "Mean jerk (m/s^3)") +
   theme_classic()
 
@@ -1315,7 +1321,7 @@ print(p_surg_jerk)
 
 p_surg_err_jerk <- 
   ggplot(surg, aes(x = MeanJerk1, y = ERRORS.SEC_RT1)) +
-  geom_point() +
+  geom_point(colour = "#dd1144", shape = 1, size = 2) +
   labs(x = "Mean jerk (m/s^3)", y = "Errors per sec.") +
   theme_classic()
 
@@ -1380,7 +1386,7 @@ res_fit_err1_df <- data.frame(sres = rstandard(err.lm1),
 
 p_res_fit_err1 <- 
   ggplot(res_fit_err1_df, aes(x = fit, y = sres)) +
-  geom_point() +
+  geom_point(colour = "#cc33cc", shape = 1, size = 2) +
   geom_hline(yintercept = 0, linetype = 2, colour = "red") +
   labs(x = "Fitted values", y = "Standardised residuals") +
   ggtitle("Raw outcome") +
@@ -1412,8 +1418,8 @@ Assumption 2: Residuals normally distributed
 
 p_qq_err1 <- 
   ggplot(res_fit_err1_df, aes(sample = sres)) +
-  geom_qq() +
-  geom_qq_line() +
+  geom_qq(colour = "#cc33cc", shape = 1, size = 2) +
+  geom_qq_line(colour = "#aaaaaa") +
   labs(x = "Normal quantile", y = "Sample quantile") +
   theme_classic()
 
@@ -1453,7 +1459,8 @@ surg$logERRORS.SEC_RT1 <- log(surg$ERRORS.SEC_RT1 )
 
 ggplot(surg, aes(x = "", y = logERRORS.SEC_RT1)) +
   geom_boxplot(outlier.shape = NA, width = 0.4) +  # avoid plotting outliers twice
-  geom_jitter(position = position_jitter(width = 0.1, height = 0.1)) +
+  geom_jitter(position = position_jitter(width = 0.1, height = 0.1),
+              colour = "#009900", shape = 1, size = 2) +
   labs(x = "", y = "log(Errors per sec.)") +
   theme_classic()
 
@@ -1485,7 +1492,7 @@ res_fit_err2_df <- data.frame(sres = rstandard(err.lm2),
 
 p_res_fit_err2 <- 
   ggplot(res_fit_err2_df, aes(x = fit, y = sres)) +
-  geom_point() +
+  geom_point(colour = "#009900", shape = 1, size = 2) +
   geom_hline(yintercept = 0, linetype = 2, colour = "red") +
   labs(x = "Fitted values", y = "Standardised residuals") +
   ggtitle("Log-transformed outcome") +
@@ -1568,7 +1575,7 @@ res_fit_err_glm1_df <- data.frame(res = qresiduals(err.glm1),
                                   fit = fitted(err.glm1))
 
 ggplot(res_fit_err_glm1_df, aes(x = fit, y = res)) +
-  geom_point() +
+  geom_point(colour = "#663399", shape = 1, size = 2) +
   geom_hline(yintercept = 0, linetype = 2, colour = "red") +
   labs(x = "Fitted values", y = "Standardised residuals") +
   ggtitle("Poisson model") +
@@ -1584,8 +1591,8 @@ ggplot(res_fit_err_glm1_df, aes(x = fit, y = res)) +
 ```{r}
 
 ggplot(res_fit_err_glm1_df, aes(sample = res)) +
-  geom_qq() +
-  geom_qq_line() +
+  geom_qq(colour = "#663399", shape = 1, size = 2) +
+  geom_qq_line(colour = "#aaaaaa") +
   labs(x = "Normal quantile", y = "Sample quantile") +
   ggtitle("Poisson model") +
   theme_classic()
@@ -1747,11 +1754,30 @@ BIC(err.glm2)
 
 ```
 
+
+ 
+  
+---
+
+# Wrap-up
+
+- Plan statistical analysis at the start
+- For each research question
+    - list outcome variables to be measured
+    - list appropriate analysis method for each
+- When you get your data
+    - plot it (check for errors, get a feel for patterns)
+- Carry out statistical analysis, *as planned* (no P hacking!)
+    - check assumptions - your model can only benefit!
+- Avoid asking a statistician for a post-mortem
+    
+  
+  
   
 ---
 
 # References
 
 
-
+There is a list of material  [here](https://cloudstor.aarnet.edu.au/plus/s/7Ugjjg7eMB39eq1) that you might find useful. It's a varied and fairly random collection!
 

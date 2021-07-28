@@ -1,0 +1,92 @@
+Bland, M., 2015, An Introduction to Medical Statistics, Oxford Uni Press, 4th ed.  (e-book in UNSW Library)
+https://primoa.library.unsw.edu.au/permalink/f/1gq3lal/UNSW_ALMA51278314110001731
+
+
+MacGillivray H, Utts JM and Heckard RF, 2013, Mind on Statistics, Cengage Learning Australia, 2nd ed., sect. 8.3, pp. 294-299  (e-book in UNSW library).
+https://primoa.library.unsw.edu.au/permalink/f/1gq3lal/UNSW_ALMA51223644710001731
+
+Genomics
+
+Holmes, S. and Huber, W., c2019, Modern Statistics for Modern Biology
+
+http://web.stanford.edu/class/bios221/book/index.html
+
+
+Statistical methods in various software packages:
+
+https://stats.idre.ucla.edu (Resources tab)
+
+
+SPSS material:
+
+Field, Andy P, 2009, Discovering Statistics Using SPSS, SAGE, 3rd ed.  (e-book UNSW Library)
+https://primoa.library.unsw.edu.au/permalink/f/1gq3lal/UNSW_ALMA51182015840001731
+
+Bittmann, F. 2019, Stata: A Really Short Introduction, De Gruyter Oldenbourg (e-book UNSW Library)
+https://primoa.library.unsw.edu.au/permalink/f/jhud33/UNSW_ALMA51258945110001731
+
+R based material:
+
+Hector, A. 2021, The New Statistics with R: An Introduction for Biologists, Oxford Uni Press, 2nd ed.
+
+
+Irizarry, Rafael, 2021, Introduction to Data Science 
+
+Irizarry, R. and Love, M. Data Analysis for the Life Sciences
+
+https://rafalab.github.io/pages/books.html
+
+
+
+Lang, T. & Altman, D. G., 2019, Statistical analyses and methods in the published literature: the SAMPL guidelines, Medical Writing 25(3).
+https://journal.emwa.org/statistics/statistical-analyses-and-methods-in-the-published-literature-the-sampl-guidelines/
+
+BMJ: Statistics Notes series 
+https://www-users.york.ac.uk/~mb55/pubs/pbstnote.htm
+
+
+Statistics in Medicine: Tutorial papers
+
+https://onlinelibrary.wiley.com/page/journal/10970258/homepage/tutorials.htm
+
+
+Deutsches Arzteblatt International: Series of articles in English on statistical methods: "Series on Evaluation of Scientific Publications"
+
+
+Circulation (Journal of the American Heart Association): Statistical Primer series
+
+Critical Care: Statistics Review series
+
+
+Biomchemia Medica: Lessons in Biostatistics series
+
+Nature: Statistics for Biologists
+https://www.nature.com/collections/qghhqm
+
+PM & R: Statistically Speaking
+
+Indian Journal of Dermatology: Biostatistics series
+
+
+------------
+
+Spriestersbach, A., 2009, Descriptive statistics, Dtsch Arztebl Int 106(36): 578–83doi: 10.3238/arztebl.2009.0578
+
+Zuur, A. F., Ieno, E. N., & Elphick, C. S. (2010). A protocol for data exploration to avoid common statistical problems. Methods in Ecology and Evolution, 1(1), 3–14. 
+https://primoa.library.unsw.edu.au/permalink/f/11jha62/TN_cdi_webofscience_primary_000288913700002
+
+Glass, G. V., Peckham, P. D., & Sanders, J. R. (1972). Consequences of failure to meet assumptions underlying the fixed effects analyses of variance and covariance. Review of Educational Research, 42(3), 237–288. https://primoa.library.unsw.edu.au/permalink/f/11jha62/TN_cdi_crossref_primary_10_2307_1169991
+
+Oberg, A. L., & Mahoney, D. W. (2007). Linear Mixed Effects Models. In W. T. Ambrosius (Ed.), Topics in Biostatistics (Vol. 404, pp. 213–234). Humana Press. 
+https://primoa.library.unsw.edu.au/permalink/f/11jha62/TN_cdi_springer_books_10_1007_978_1_59745_530_5_11
+
+Wasserstein, R. L., Schirm, A. L., & Lazar, N. A. (2019). Moving to a world beyond “p<0.05.” The American Statistician, 73(sup1), 1–19.
+https://primoa.library.unsw.edu.au/permalink/f/11jha62/TN_cdi_crossref_primary_10_1080_00031305_2019_1583913
+
+Greenland, S. et al, 2016, Statistical tests, p values, confidence intervals, and power: a guide to misinterpretations,  European Journal of Epidemiology 31(4): 337-350
+https://primoa.library.unsw.edu.au/permalink/f/11jha62/TN_cdi_pubmed_primary_27209009
+
+
+
+
+
