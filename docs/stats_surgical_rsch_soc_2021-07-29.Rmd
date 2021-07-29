@@ -1779,5 +1779,5 @@ BIC(err.glm2)
 # References
 
 
-There is a list of material  [here](https://cloudstor.aarnet.edu.au/plus/s/7Ugjjg7eMB39eq1) that you might find useful. It's a varied and fairly random collection!
+There is a list of material  [here](https://cloudstor.aarnet.edu.au/plus/s/lKK3WxReeCB6rZN) that you might find useful. It's a varied and fairly random collection!
 
